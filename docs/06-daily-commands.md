@@ -11,7 +11,70 @@
 | コマンドの意味を英語で（`‿` は音がつながる＝リンキングする箇所） | リンキングを反映したカタカナ読み（`(ト)` は弱くなる・ほぼ発音しない音） | 日本語訳 |
 
 - サブモジュールのディレクトリ名は `schema` としています
-- `git -C schema ...` は「`schema` に移動してから実行する」という意味です。`cd` を使わないので、**今どちらのリポジトリにいるのかで迷いません**
+- `git -C schema ...` は「`schema` の中で実行する」という意味です（↓ 詳しく）
+
+## `-C`（ハイフン C）の意味
+
+```bash
+git -C schema status
+```
+
+| EN | 読み | JP |
+|---|---|---|
+| Run git‿as‿if it‿started‿in schema. | ラン ギッタズィフ イッスターティッディン スキーマ | git を、schema ディレクトリで起動したかのように実行する |
+
+- `-C` は **Change directory**（チェインジ ディレクトリー＝ディレクトリを変える）の頭文字です
+- `git -C <パス> <コマンド>` は、「`<パス>` に移動してから `git <コマンド>` を実行する」のと同じ結果になります
+- ただし、**今いる場所（カレントディレクトリ）は変わりません**。コマンドが終わっても、backend にいたままです
+- `-C` は `git` の直後に書きます。`git status -C schema` のように後ろに書くとエラーになります（`unknown switch 'C'`）
+
+### 図
+
+```
+ いる場所: backend/                          いる場所: backend/（変わらない）
+     │                                           ▲
+     │  git -C schema status                     │ 終わったら戻ってくる必要もない
+     ▼                                           │
+ ┌─ backend/ ─────────────────────────────┐      │
+ │   schema/  ← ここで status を実行 ──────┼──────┘
+ └────────────────────────────────────────┘
+```
+
+### `cd` との比較
+
+```bash
+# cd を使う場合（3 行・戻り忘れの危険あり）
+cd schema
+git status
+cd ..
+
+# -C を使う場合（1 行・いる場所は backend のまま）
+git -C schema status
+```
+
+| | `cd schema` してから実行 | `git -C schema ...` |
+|---|---|---|
+| いる場所 | schema に変わる | backend のまま |
+| 戻り忘れ | 起きる（backend のつもりで schema に commit してしまう） | 起きない |
+| コピー＆ペースト | 前後の `cd` も必要 | 1 行で完結 |
+
+**サブモジュールの操作では、どちらのリポジトリに対する操作かが 1 行で分かる `-C` を使います。**
+
+### 確認
+
+```bash
+pwd && git rev-parse --show-toplevel && git -C schema rev-parse --show-toplevel
+```
+
+| EN | 読み | JP |
+|---|---|---|
+| Show where‿I am, and the top‿of each repository. | ショウ ウェアライ アム アン(ド) ザ トッポヴ イーチ リポジトリー | 今いる場所と、backend・schema それぞれのリポジトリの最上位ディレクトリを表示する |
+
+```
+/home/you/backend           ← 今いる場所
+/home/you/backend           ← git status などが対象にするリポジトリ
+/home/you/backend/schema    ← git -C schema ... が対象にするリポジトリ
+```
 
 ## 全体の流れ
 
