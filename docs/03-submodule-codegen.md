@@ -31,7 +31,7 @@ git config --global diff.submodule log              # diff でサブモジュー
 git config --global status.submoduleSummary true    # status にサブモジュールの差分要約を表示
 ```
 
-> `submodule.recurse = true` にすると、`git switch release/1.5` するだけでサブモジュールも release/1.5 が記録しているスキーマに自動で切り替わります。**チェリーピック運用では必須級の設定**です。
+> `submodule.recurse = true` にすると、`git switch hotfix/prod-...` するだけでサブモジュールもそのブランチが記録しているスキーマに自動で切り替わります。**チェリーピック運用では必須級の設定**です。
 
 ## 3-3. 場面別の手順
 
@@ -59,7 +59,7 @@ git commit -m "chore: GraphQL スキーマをサブモジュールとして追�
 	branch = main
 ```
 
-> URL は **HTTPS 形式**にしておくと、CI（GitHub Actions）がトークンでそのまま取得できます。手元で SSH を使いたい人は `git config --global url."git@github.com:".insteadOf "https://github.com/"` で読み替えられます。
+> URL は **HTTPS 形式**にしておくと、CI（CodeBuild）がトークンでそのまま取得できます（[5-5](05-aws-pipeline.md#5-5-サブモジュールを-codebuild-で取得する)）。手元で SSH を使いたい人は `git config --global url."git@github.com:".insteadOf "https://github.com/"` で読み替えられます。
 
 ### スキーマを最新に上げる（いちばんよくある作業）
 
@@ -95,7 +95,7 @@ schema リポジトリ側の変更が先です。
 # 2. backend 側で上の「最新に上げる」手順を実行
 ```
 
-> **schema の未マージのブランチを backend の main から指さない。** schema 側のブランチが消えると、そのコミットを誰も取得できなくなります。CI でチェックします（[examples/ci.yml](../examples/ci.yml)）。
+> **schema の未マージのブランチを backend の main から指さない。** schema 側のブランチが消えると、そのコミットを誰も取得できなくなります。CI でチェックします（[examples/scripts/check-schema-pin.sh](../examples/scripts/check-schema-pin.sh)）。
 
 ### 別ブランチに移ったら schema がズレた（`+` が付いている）
 
@@ -114,16 +114,18 @@ git submodule update --init --recursive   # 記録されたコミットに戻す
 
 **A をおすすめします。** スキーマのバージョンと生成コードが必ず一致し、「生成し忘れ」がそもそも起きません。雛形は [examples/build.rs](../examples/build.rs) を参照してください。
 
-B を選ぶ場合は、CI で「再生成して差分が出ないこと」を検査します（[examples/ci.yml](../examples/ci.yml) にコメントで記載）。
+B を選ぶ場合は、`buildspec/build.yml` と `buildspec/pr.yml` に「再生成して `git diff --exit-code` で差分が出ないこと」の検査を追加します。
 
 > **コードファースト（async-graphql などで Rust から SDL を出力する）構成の場合**は、生成の向きが逆になります。その場合は「Rust から出力した SDL と `schema/schema.graphql` が一致すること」を CI で検査すると、同じく 1 つのコミット ID でバージョンを管理できます。
 
-## 3-5. スキーマ更新を release に運ぶ（cherry-pick）
+## 3-5. スキーマ更新を hotfix で本番に出す（cherry-pick）
 
-スキーマ更新コミットも、通常の修正と同じく cherry-pick で運べます。
+通常、スキーマ更新は main にマージすればパイプラインで本番まで流れます。main をそのまま出せないときだけ、hotfix で運びます（[2-4](02-branch-strategy.md#2-4-緊急修正hotfix--cherry-pick)）。
 
 ```bash
-git switch -c pick/1.5/schema-bump origin/release/1.5
+git fetch --tags
+TAG=$(git tag -l 'prod-*' --sort=-refname | head -1)
+git switch -c "hotfix/$TAG" "$TAG"
 git cherry-pick -x <スキーマ更新コミットの SHA>
 git submodule update --init --recursive   # ← 必須: cherry-pick はサブモジュールの中身までは更新しない
 cargo build && cargo test
@@ -133,7 +135,7 @@ cargo build && cargo test
 
 ### gitlink が衝突したとき
 
-release 側で別のスキーマ更新を先に運んでいた場合などに起きます。
+hotfix 側で別のスキーマ更新を先に運んでいた場合などに起きます。
 
 ```bash
 git status
@@ -148,11 +150,11 @@ git cherry-pick --continue
 
 ### 注意: 「スキーマの互換性」を先に確認する
 
-release に新しいスキーマを運ぶ = 本番 API の形が変わる、ということです。運ぶ前に差分を確認しましょう。
+スキーマを本番に出す = 本番 API の形が変わる、ということです。出す前に差分を確認しましょう。
 
 ```bash
-git diff origin/release/1.5 origin/main -- schema          # 何コミット分進むか（diff.submodule=log）
-git -C schema diff <release側のSHA> <main側のSHA> -- schema.graphql   # SDL の差分そのもの
+git diff "$TAG" origin/main -- schema                                  # 何コミット分進むか（diff.submodule=log）
+git -C schema diff <本番側のSHA> <main側のSHA> -- schema.graphql         # SDL の差分そのもの
 ```
 
-**フィールドの削除・型の変更（破壊的変更）は release に運ばない**のが原則です。破壊的変更は次の `release/X.Y` で出します。
+**フィールドの削除・型の変更（破壊的変更）は一度に出さない**のが原則です。クライアントが追従できるよう「新フィールド追加 → クライアント移行 → 旧フィールドを `@deprecated` → 削除」と、別々のリリースに分けます。

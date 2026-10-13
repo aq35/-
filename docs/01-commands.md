@@ -101,9 +101,10 @@
 
 | コマンド | 英単語の意味 | English | 日本語 |
 |---|---|---|---|
-| `git tag -a v1.4.0 -m "msg"` | tag = 札 / annotated = 注釈つき | Create an annotated tag | 注釈つきタグ（リリース印）を作る |
-| `git push origin v1.4.0` | | Push a tag | タグをリモートへ送る（= 本番リリース） |
-| `git tag -l "v1.4.*"` | list | List matching tags | 条件に合うタグを一覧 |
+| `git tag -a v1.4.0 -m "msg"` | tag = 札 / annotated = 注釈つき | Create an annotated tag | 注釈つきタグ（印）を作る |
+| `git push origin v1.4.0` | | Push a tag | タグをリモートへ送る |
+| `git tag -l "prod-*" --sort=-refname` | list / sort = 並べる | List matching tags, newest first | 条件に合うタグを新しい順に一覧（このガイドでは本番リリースの記録） |
+| `git fetch --tags` | | Download all tags | リモートのタグを取得 |
 | `git describe --tags` | describe = 説明する | Show nearest tag | 現在地から最も近いタグを表示 |
 
 ## 1-11. サブモジュール — submodule

@@ -1,34 +1,46 @@
-# 2. ブランチ戦略（チェリーピック運用）
+# 2. ブランチ戦略（トランクベース ＋ チェリーピックによる緊急修正）
+
+AWS が推奨する継続的デリバリーの形（[Deployment Pipeline Reference Architecture](https://pipelines.devops.aws.dev/)、[Amazon Builders' Library](https://aws.amazon.com/builders-library/)）に合わせています。パイプライン側の設計は [5. AWS パイプライン](05-aws-pipeline.md) を参照してください。
 
 ## 2-1. 全体像
 
 ```
-                 feat/*  fix/*   （短命: 数時間〜数日）
-                   │       │  PR + squash merge
-                   ▼       ▼
-main ──●──●──●──●──●──●──●──●──●──▶      → 開発環境 (dev)
-          \              │
-           \             │ cherry-pick -x （修正だけを選んで運ぶ）
-            ▼            ▼
-release/1.4 ●────────────●───▶           → 検証環境 (staging)
-            v1.4.0       v1.4.1          → タグ push で本番 (prod)
+          feat/*  fix/*      （短命: 数時間〜数日。PR + squash merge）
+            │       │
+            ▼       ▼
+main ──●──●──●──●──●──●──▶   1 コミット = 1 回のビルド
+                     │
+                     └─▶ [Build] → [dev] → [staging] → [承認] → [prod] → タグ prod-YYYYMMDD-HHMMSS
+                            同じイメージを昇格させる（Build once, deploy many）
+
+緊急時のみ:
+prod-20261013-101500 ●──●  hotfix/prod-20261013-101500
+                        └ main の修正を cherry-pick -x → 同じ段階を通って prod へ
 ```
 
-| ブランチ / タグ | 役割 | 誰が更新するか | デプロイ先 |
-|---|---|---|---|
-| `main` | 開発の本流。常にビルドが通る | PR の squash merge のみ | dev |
-| `feat/*` `fix/*` `chore/*` | 作業用。main から切って main へ戻す | 各開発者 | — |
-| `release/X.Y` | リリース系列。main から切り出す | `cherry-pick -x` の PR のみ | staging |
-| タグ `vX.Y.Z` | 本番に出す版 | リリース担当 | prod |
+| ブランチ / タグ | 役割 | 誰が更新するか |
+|---|---|---|
+| `main` | 唯一の本流。マージ = 本番へ向かうリリース候補 | PR の squash merge のみ |
+| `feat/*` `fix/*` `chore/*` | 作業用。main から切って main へ戻す | 各開発者 |
+| タグ `prod-*` | 本番に出たコミットの記録 | **パイプラインが自動で打つ** |
+| `hotfix/<本番タグ>` | 緊急修正の運搬用。本番タグから切る | `cherry-pick -x` のみ（CI で強制） |
 
-### なぜこの形か
+### 覚えるルールは 4 つ
 
-- **ブランチが 2 種類（main と release）しかない** → 覚えることが少ない
-- **修正は必ず main が先** → 「本番だけ直って main に戻し忘れた」が起きない
-- **release には選んだ修正だけ入る** → main で開発中の未完成機能が本番に混ざらない
-- **squash merge で 1 PR = 1 コミット** → チェリーピックの単位がそのまま PR になる
+1. **すべての変更はまず `main` へ**（Upstream First）
+2. **ビルドは 1 回、同じ成果物を dev → staging → prod へ昇格させる**
+3. **本番に出たらパイプラインがタグを打つ**（人はタグを打たない）
+4. **緊急修正は本番タグから `hotfix/*` を切り、`cherry-pick -x` で運ぶ**
 
-> git-flow の `develop` / `hotfix` ブランチは使いません。`main` が develop の役、`release/*` への cherry-pick が hotfix の役を兼ねます。
+### 前の版（release ブランチ ＋ 手動タグ）から変えた理由
+
+| 観点 | 前の版 | 今の版（AWS 推奨） |
+|---|---|---|
+| ビルド | 環境ごとにビルド | **1 回だけ**。staging で確認したイメージがそのまま本番へ |
+| 本番の起動 | 人がタグを push | **承認ボタン**。タグはデプロイ結果の記録 |
+| 常設ブランチ | main ＋ release/X.Y | **main だけ** |
+| cherry-pick | 毎回のリリースで使う | **緊急時だけ**使う |
+| 未完成の機能 | release に入れないことで隔離 | **機能フラグ**で隠して main に入れる |
 
 ---
 
@@ -36,28 +48,30 @@ release/1.4 ●────────────●───▶           →
 
 ```bash
 git switch main && git pull                  # 最新化
-git switch -c feat/user-search               # 作業ブランチ作成
+git switch -c feat/user-search               # 作業ブランチ作成（just start feat/user-search）
 
 # ...編集...
-git add -p                                   # 変更を選んでステージ
+git add -p
 git commit -m "feat: ユーザー検索 API を追加"
 
 git fetch && git rebase origin/main          # 最新 main に追従（必要なとき）
-git push                                     # push.autoSetupRemote で -u 不要
-# → GitHub で PR 作成 → レビュー → "Squash and merge"
+git push
+# → PR 作成 → CodeBuild の PR 検証が通る → レビュー → "Squash and merge"
+# → パイプラインが起動し dev → staging まで自動で進む
 ```
 
-マージ後の掃除:
+### main を常にリリース可能に保つ
 
-```bash
-git switch main && git pull
-git branch -d feat/user-search
-git fetch --prune                            # 消えたリモートブランチを掃除
-```
+main へのマージは、そのまま本番へのリリース候補になります。
+
+- **PR は小さく**: 数百行以内を目安にする
+- **未完成の機能は機能フラグで隠す**: コードは main に入れつつ、本番では無効にしておく（AWS AppConfig の機能フラグなど）
+- **DB・API の変更は互換性を保って段階的に**: 追加 → 移行 → 削除の順に、別々のリリースで行う
+- **壊したらすぐ直すか、`git revert` で戻す**: main を止めない
 
 ### ブランチ名・コミットメッセージ
 
-[Conventional Commits](https://www.conventionalcommits.org/) の型をそのまま使うと、ブランチ名とメッセージが揃って覚えやすくなります。
+[Conventional Commits](https://www.conventionalcommits.org/) の型を使います。
 
 | 型 | 意味 | ブランチ例 | squash 後のコミット例 |
 |---|---|---|---|
@@ -69,107 +83,92 @@ git fetch --prune                            # 消えたリモートブランチ
 
 ---
 
-## 2-3. リリースの切り出し（main → release）
+## 2-3. 本番リリース（人がやるのは承認だけ）
 
-main の「ここまでを次のリリースにする」地点からブランチを切ります。
-
-```bash
-git switch main && git pull
-git switch -c release/1.5
-git push                                      # → staging に自動デプロイ
+```
+main にマージ → Build → dev → staging → ⏸ 承認待ち → prod → タグ prod-* を自動作成
 ```
 
-staging で確認できたら、タグを打って本番へ。
+1. staging で動作を確認する
+2. CodePipeline の承認アクションで「承認」する
+3. prod へのデプロイが成功すると、パイプラインがコミットに `prod-YYYYMMDD-HHMMSS` タグを打つ
+
+本番の状況は Git から確認できます。
 
 ```bash
-git tag -a v1.5.0 -m "Release 1.5.0"
-git push origin v1.5.0                        # → prod に自動デプロイ
+git fetch --tags
+git tag -l 'prod-*' --sort=-refname | head -5             # 直近の本番リリース
+git log --oneline $(git tag -l 'prod-*' --sort=-refname | head -1)..origin/main   # まだ本番に出ていない変更（just prod）
+git log --oneline prod-20261012-150000..prod-20261013-101500   # 2 つのリリースの差分（リリースノート用）
 ```
+
+> デプロイが失敗したときは、パイプラインがそのステージを**直前に成功した版へ自動でロールバック**します（V2 パイプラインのステージ失敗時ロールバック）。
 
 ---
 
-## 2-4. リリース後の修正（main → cherry-pick → release）
+## 2-4. 緊急修正（hotfix ＋ cherry-pick）
 
-**本番の不具合も、まず main で直します。** その後、修正コミットだけを release に運びます。
+### まずは「main で直して通常どおり流す」
+
+修正が小さく、main の他の変更も本番に出して問題なければ、**通常どおり main にマージして流すのが最速かつ最も安全**です。hotfix は使いません。
+
+### hotfix を使うのは「main をそのまま出せない」ときだけ
+
+例: main に、本番に出す前の確認がまだ必要な変更が入っている。
 
 ```bash
-# ① いつも通り fix/* ブランチで修正 → PR → main に squash merge
+# ① いつも通り fix/* → PR → main に squash merge（修正は必ず main が先）
 #    マージされたコミットの SHA を控える（例: 9f8e7d6）
 
-# ② release ブランチから運搬用ブランチを切る
-git fetch
-git switch -c pick/1.5/login-timeout origin/release/1.5
-
-# ③ チェリーピック（-x で "(cherry picked from commit 9f8e7d6)" が残る）
+# ② 最新の本番タグから hotfix ブランチを切って cherry-pick（just hotfix 9f8e7d6）
+git fetch --tags
+TAG=$(git tag -l 'prod-*' --sort=-refname | head -1)
+git switch -c "hotfix/$TAG" "$TAG"
 git cherry-pick -x 9f8e7d6
+git submodule update --init --recursive      # cherry-pick はサブモジュールの中身を更新しない
 
-# ④ push → release/1.5 宛てに PR → マージ → staging で確認
+# ③ push すると hotfix 用パイプラインが起動 → staging → 承認 → prod
 git push
-
-# ⑤ 本番へ
-git switch release/1.5 && git pull
-git tag -a v1.5.1 -m "Release 1.5.1: ログインのタイムアウト修正"
-git push origin v1.5.1
 ```
 
-### 複数コミットをまとめて運ぶ
+hotfix 用パイプラインの Build では `scripts/check-hotfix.sh` が走り、次の場合は**ビルドを失敗させます**。
+
+- `-x` の記録（`(cherry picked from commit ...)`）がないコミットがある
+- 元のコミットが main に存在しない（main への反映漏れ）
+- マージコミットが含まれている
+
+本番に出た時点で、パイプラインが hotfix のコミットにも `prod-*` タグを打ちます。次の hotfix は、そのタグから切ればよいだけです。hotfix ブランチは main にマージしません（修正はすでに main にあるため）。デプロイが終わったら削除します。
+
+> **hotfix 中の注意**: 通常のパイプラインも同じ staging / prod にデプロイします。hotfix が本番に出るまでは、通常パイプラインの承認を止めておきます。
+
+### 複数コミット・衝突
 
 ```bash
-git cherry-pick -x 1111111 2222222 3333333    # 列挙（古い順に書く）
+git cherry-pick -x 1111111 2222222            # 列挙（古い順に書く）
 git cherry-pick -x 1111111^..3333333          # 範囲（1111111 を含む）
-```
 
-### コンフリクト（衝突）したら
-
-```bash
-git status                       # 衝突ファイルを確認
-# ...ファイルを編集して解決...
-git add <解決したファイル>
-git cherry-pick --continue       # 続行
-# やめたいとき: git cherry-pick --abort
-```
-
-`rerere.enabled = true`（[examples/gitconfig](../examples/gitconfig)）にしておくと、**同じ衝突の解決を Git が覚えて自動で再適用**します。複数の release に同じ修正を運ぶときに効きます。
-
-### 「どの修正が release に入っているか」を調べる
-
-```bash
-# main にあって release/1.5 にまだ無いコミット（同等パッチは除外して表示）
-git log --oneline --cherry-pick --right-only origin/release/1.5...origin/main
-
-# あるコミットが運ばれたか（-x の記録を検索）
-git log origin/release/1.5 --grep "cherry picked from commit 9f8e7d6"
-
-# 前回リリースからの変更一覧（リリースノート用）
-git log --oneline v1.5.0..v1.5.1
+# 衝突したら
+git status                                    # 衝突ファイルを確認 → 編集して解決
+git add <ファイル>
+git cherry-pick --continue                    # やめる: git cherry-pick --abort
 ```
 
 ---
 
-## 2-5. ルールまとめ（ブランチ保護で強制する）
-
-GitHub の Branch protection / Rulesets で次を設定すると、ルールを「覚える」必要すらなくなります。
+## 2-5. GitHub 側の設定（ルールを仕組みで強制する）
 
 | 対象 | 設定 |
 |---|---|
-| `main` | PR 必須、CI 必須、**Squash merge のみ許可**、force push 禁止 |
-| `release/*` | PR 必須、CI 必須、force push 禁止、削除禁止 |
-| タグ `v*` | 作成をリリース担当に限定、削除・移動禁止 |
+| `main` | PR 必須、**PR 検証（CodeBuild）の成功が必須**、Squash merge のみ許可、force push 禁止 |
+| `hotfix/*` | 作成・push できる人をリリース担当に限定、force push 禁止 |
+| タグ `prod-*` | 作成はパイプラインのトークンのみ、削除・移動禁止 |
 
 ### やってはいけないこと
 
 | NG | 理由 | 代わりに |
 |---|---|---|
-| release に直接コミット | main に修正が戻らず、次のリリースで不具合が再発 | main で直して cherry-pick |
-| release を main にマージ | release 専用の変更が main に逆流し、履歴が複雑化 | 何もしない（main が常に正） |
+| hotfix に直接コミット | main に修正が戻らず、次のリリースで不具合が再発する（CI でも弾かれる） | main で直して cherry-pick |
+| hotfix を main にマージ | 修正は main にすでにあり、履歴が重複する | 何もしない（main が常に正） |
+| 環境ごとに作り直したイメージを出す | staging で確認したものと別物が本番に出る | 同じダイジェストを昇格させる |
+| 長期間生きる feature ブランチ | main との差が広がり、マージ時に壊れる | 機能フラグで隠して小さく main へ |
 | 共有ブランチで `reset` / force push | 他の人の履歴が壊れる | `revert` |
-| 打ったタグを付け直す | 何が本番に出たのか追えなくなる | 新しいパッチ番号で打つ |
-| `cherry-pick` で `-x` を省く | 運搬元を追跡できない | 常に `-x`（エイリアス `git cp` で固定） |
-
-### バージョン番号の付け方
-
-| 変更 | 例 | どこで打つ |
-|---|---|---|
-| 新しいリリース系列 | `v1.5.0` | `release/1.5` を切った直後 |
-| 修正だけのリリース | `v1.5.1` `v1.5.2` | cherry-pick 後の `release/1.5` |
-| 互換性を壊す変更 | `v2.0.0` | `release/2.0` |

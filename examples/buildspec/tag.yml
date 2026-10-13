@@ -1,0 +1,20 @@
+# 本番デプロイ成功後に、デプロイしたコミットへ Git タグ prod-YYYYMMDD-HHMMSS を打つ。
+# タグは「何が本番に出たか」の記録で、hotfix を切る起点になる（タグでデプロイを起動するのではない）。
+#
+# パイプラインから渡される環境変数:
+#   COMMIT_SHA, FULL_REPO, EXECUTION_ID
+#   GITHUB_TAG_TOKEN（Secrets Manager。backend の contents:write のみ）
+version: 0.2
+
+env:
+  shell: bash
+
+phases:
+  build:
+    commands:
+      - git config --global user.name  "deploy-pipeline"
+      - git config --global user.email "deploy-pipeline@users.noreply.github.com"
+      - TAG="prod-$(date -u +%Y%m%d-%H%M%S)"
+      - git tag -a "$TAG" -m "Deployed to prod (pipeline execution ${EXECUTION_ID})" "$COMMIT_SHA"
+      - git push "https://x-access-token:${GITHUB_TAG_TOKEN}@github.com/${FULL_REPO}.git" "refs/tags/$TAG"
+      - echo "tagged $COMMIT_SHA as $TAG"

@@ -1,0 +1,20 @@
+# Deploy アクション（dev / staging / prod 共通）
+# 対象環境のアカウントのロールを引き受けて、ビルド済みイメージをデプロイする。
+#
+# パイプラインから渡される環境変数:
+#   TARGET_ENV, TARGET_ACCOUNT_ID, DEPLOY_ROLE_NAME, IMAGE_URI
+version: 0.2
+
+env:
+  shell: bash
+
+phases:
+  build:
+    commands:
+      - |
+        read -r AK SK ST <<< "$(aws sts assume-role \
+          --role-arn "arn:aws:iam::${TARGET_ACCOUNT_ID}:role/${DEPLOY_ROLE_NAME}" \
+          --role-session-name "pipeline-${TARGET_ENV}" \
+          --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' --output text)"
+        export AWS_ACCESS_KEY_ID="$AK" AWS_SECRET_ACCESS_KEY="$SK" AWS_SESSION_TOKEN="$ST"
+      - bash scripts/deploy.sh "$TARGET_ENV" "$IMAGE_URI"

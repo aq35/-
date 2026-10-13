@@ -24,14 +24,15 @@
 | 何が変わるか見る | `git diff --submodule=log` | — |
 | サブモジュール内で操作 | `git -C schema <cmd>` | — |
 
-## リリース
+## リリース・緊急修正
 
-| やりたいこと | コマンド | just |
+| やりたいこと | コマンド / 操作 | just |
 |---|---|---|
-| リリース系列を切る | `git switch -c release/1.5 origin/main && git push` | `just release-cut 1.5` |
-| 修正を運ぶ | `git switch -c pick/1.5/xxx origin/release/1.5 && git cherry-pick -x <sha>` | `just pick 1.5 <sha>` |
-| 運び漏れを確認 | `git log --oneline --cherry-pick --right-only origin/release/1.5...origin/main` | `just missing 1.5` |
-| 本番リリース | `git tag -a v1.5.1 -m "..." && git push origin v1.5.1` | `just ship v1.5.1` |
+| 本番に出す | staging を確認 → CodePipeline で「承認」 | — |
+| 今の本番と未リリースの変更を見る | `git log --oneline $(git tag -l 'prod-*' --sort=-refname \| head -1)..origin/main` | `just prod` |
+| 緊急修正を運ぶ | `git switch -c hotfix/<本番タグ> <本番タグ> && git cherry-pick -x <sha>` → `git push` | `just hotfix <sha>` |
+| hotfix の中身を検査 | `bash scripts/check-hotfix.sh <本番タグ>` | （`just hotfix` が実行） |
+| デプロイを戻す | 失敗時は自動ロールバック。手動なら main で `git revert` して流す | — |
 
 ## 困ったとき
 
@@ -53,6 +54,7 @@
 
 | Git の操作 | 結果 |
 |---|---|
-| `main` へマージ | dev にデプロイ |
-| `release/*` へ push / マージ | staging にデプロイ |
-| タグ `v*` を push | prod にデプロイ |
+| PR を作成・更新 | CodeBuild で PR 検証（main へのマージ条件） |
+| `main` へマージ | Build → dev → staging まで自動。承認後に prod |
+| `hotfix/*` を push | hotfix 用パイプラインで Build → dev → staging → 承認 → prod |
+| prod へのデプロイ成功 | パイプラインがタグ `prod-*` を自動で作成 |

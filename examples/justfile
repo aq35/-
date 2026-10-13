@@ -34,37 +34,25 @@ schema-bump:
     @echo "問題なければ:"
     @echo "  git add schema src/ && git commit -m \"chore(schema): スキーマを $(git -C schema rev-parse --short HEAD) に更新\""
 
-# リリース系列を切る  例: just release-cut 1.5
-release-cut version:
-    git fetch origin
-    git switch -c release/{{version}} origin/main
-    git push -u origin release/{{version}}
-
-# main のコミットを release に運ぶ  例: just pick 1.5 9f8e7d6
-pick version +shas:
-    git fetch origin
-    git switch -c pick/{{version}}/$(git rev-parse --short $(echo {{shas}} | awk '{print $1}')) origin/release/{{version}}
-    git cherry-pick -x {{shas}}
-    git submodule update --init --recursive  # cherry-pick はサブモジュールの中身を更新しないため
-    @echo "push して release/{{version}} 宛てに PR を作成してください"
-
-# main にあって release にまだ無いコミット  例: just missing 1.5
-missing version:
-    git fetch origin
-    git log --oneline --cherry-pick --right-only origin/release/{{version}}...origin/main
-
-# 本番リリース（release/X.Y 上でタグを打って push）  例: just ship v1.5.1
-ship tag:
+# 本番の状況（最新の本番タグと、まだ本番に出ていない main のコミット）
+prod:
     #!/usr/bin/env bash
     set -euo pipefail
-    branch=$(git branch --show-current)
-    if [[ "$branch" != release/* ]]; then
-      echo "release/* ブランチで実行してください（現在: $branch）"; exit 1
-    fi
-    if [[ "{{tag}}" != "v${branch#release/}."* ]]; then
-      echo "タグ {{tag}} はブランチ $branch と一致しません（例: v${branch#release/}.1）"; exit 1
-    fi
-    git pull --ff-only
-    git tag -a "{{tag}}" -m "Release {{tag}}"
-    git push origin "{{tag}}"
-    echo "{{tag}} を push しました → 本番デプロイが始まります"
+    git fetch -q origin --tags
+    tag=$(git tag -l 'prod-*' --sort=-refname | head -1)
+    echo "本番: $tag ($(git log -1 --format='%h %s' "$tag"))"
+    echo "未リリース:"
+    git log --oneline "$tag..origin/main"
+
+# 緊急修正: 最新の本番タグから hotfix ブランチを切り、main の修正を運ぶ  例: just hotfix 9f8e7d6
+hotfix +shas:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    git fetch -q origin --tags
+    tag=$(git tag -l 'prod-*' --sort=-refname | head -1)
+    git switch -c "hotfix/$tag" "$tag"
+    git cherry-pick -x {{shas}}
+    git submodule update --init --recursive   # cherry-pick はサブモジュールの中身を更新しないため
+    bash scripts/check-hotfix.sh "$tag"
+    echo ""
+    echo "問題なければ git push → hotfix 用パイプラインが起動します"
