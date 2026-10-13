@@ -1,0 +1,59 @@
+# 推奨 Git 設定
+#
+# 使い方（このファイルを ~/.gitconfig から読み込む）:
+#   git config --global include.path "$(pwd)/examples/gitconfig"
+#
+# 名前とメールは各自で:
+#   git config --global user.name  "Your Name"
+#   git config --global user.email "you@example.com"
+
+[init]
+	defaultBranch = main
+
+[pull]
+	rebase = true              # pull 時にマージコミットを作らず、自分のコミットを積み直す
+
+[push]
+	autoSetupRemote = true     # 初回 push で -u origin <branch> が不要
+	recurseSubmodules = check  # サブモジュールの未 push コミットを指したままの push を拒否
+
+[fetch]
+	prune = true               # リモートで消えたブランチを自動で掃除
+	recurseSubmodules = on-demand
+
+[rebase]
+	autoStash = true           # 作業中の変更があっても rebase できる
+
+[rerere]
+	enabled = true             # 衝突の解決を記憶して再利用（cherry-pick を繰り返すときに効く）
+
+[submodule]
+	recurse = true             # switch / pull / checkout でサブモジュールも自動で揃える
+
+[diff]
+	submodule = log            # diff でサブモジュールの変化をコミット一覧で表示
+	algorithm = histogram      # より読みやすい差分
+
+[status]
+	submoduleSummary = true    # status にサブモジュールの差分要約を表示
+
+[merge]
+	conflictStyle = zdiff3     # 衝突表示に「共通の祖先」も表示して解決しやすく
+
+[alias]
+	# 見る
+	st   = status -sb
+	lg   = log --oneline --graph --decorate -20
+	last = show --stat HEAD
+	# 記録する
+	ap   = add -p
+	ci   = commit
+	fix  = commit --amend --no-edit
+	# 同期する
+	sync = !git fetch origin && git rebase origin/main
+	# 運ぶ（-x を付け忘れないように固定）
+	cp   = cherry-pick -x
+	# 取り消す
+	undo = reset --soft HEAD~1
+	# サブモジュール
+	sub  = submodule update --init --recursive
