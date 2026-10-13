@@ -114,13 +114,13 @@ git submodule update --init --recursive   # 記録されたコミットに戻す
 
 **A をおすすめします。** スキーマのバージョンと生成コードが必ず一致し、「生成し忘れ」がそもそも起きません。雛形は [examples/build.rs](../examples/build.rs) を参照してください。
 
-B を選ぶ場合は、`buildspec/build.yml` と `buildspec/pr.yml` に「再生成して `git diff --exit-code` で差分が出ないこと」の検査を追加します。
+B を選ぶ場合は、`buildspec/build.yml` と、`infra/pipeline.yml` 内の PR 検証の buildspec に「再生成して `git diff --exit-code` で差分が出ないこと」の検査を追加します。
 
 > **コードファースト（async-graphql などで Rust から SDL を出力する）構成の場合**は、生成の向きが逆になります。その場合は「Rust から出力した SDL と `schema/schema.graphql` が一致すること」を CI で検査すると、同じく 1 つのコミット ID でバージョンを管理できます。
 
 ## 3-5. スキーマ更新を hotfix で本番に出す（cherry-pick）
 
-通常、スキーマ更新は main にマージすればパイプラインで本番まで流れます。main をそのまま出せないときだけ、hotfix で運びます（[2-4](02-branch-strategy.md#2-4-緊急修正hotfix--cherry-pick)）。
+通常、スキーマ更新は main にマージすればパイプラインで本番まで流れます。main をそのまま出せないときだけ、hotfix で運びます（[2-4](02-branch-strategy.md#2-4-本番で障害が起きたら)）。
 
 ```bash
 git fetch --tags
@@ -158,3 +158,52 @@ git -C schema diff <本番側のSHA> <main側のSHA> -- schema.graphql         #
 ```
 
 **フィールドの削除・型の変更（破壊的変更）は一度に出さない**のが原則です。クライアントが追従できるよう「新フィールド追加 → クライアント移行 → 旧フィールドを `@deprecated` → 削除」と、別々のリリースに分けます。
+
+## 3-6. スキーマを複数のサービス・フロントエンドで共有する運用
+
+スキーマは backend だけでなく、他のサービスやフロントエンドも使っています。そのため、**スキーマ専用リポジトリを分ける今の構成を続けます**。統合すると、他のサービスが backend のリポジトリに依存することになるためです。
+
+その代わり、サブモジュールの手間と、スキーマ変更による事故を次の 3 つで減らします。
+
+```
+ schema リポジトリ                          backend / 他サービス / フロントエンド
+ ┌─────────────────────────────┐            ┌──────────────────────────────┐
+ │ PR → 破壊的変更チェック（CI）   │   main     │ Dependabot が「schema 更新」PR │
+ │    → レビュー → main へマージ  │ ─────────▶ │ を自動作成 → ビルド・テスト    │
+ └─────────────────────────────┘            └──────────────────────────────┘
+```
+
+### ① schema リポジトリで、破壊的変更を CI で止める
+
+フィールドの削除や型の変更は、どこか 1 つの利用者を壊します。schema リポジトリの PR 検証で、main と比べて検出します。
+
+```bash
+npx @graphql-inspector/cli diff 'git:origin/main:schema.graphql' schema.graphql
+```
+
+| EN | 読み | JP |
+|---|---|---|
+| Diff the schema against main. | ディフ ザ スキーマ アゲンス(ト) メイン | main のスキーマと比べて、破壊的変更があれば失敗させる |
+
+破壊的変更が必要なときは、利用者が追従できるよう段階を分けます。
+
+| 段階 | schema リポジトリ | 利用者（backend・他サービス・フロント） |
+|---|---|---|
+| 1 | 新しいフィールドを**追加** | — |
+| 2 | 古いフィールドに `@deprecated(reason: "...")` を付ける | 新しいフィールドへ移行 |
+| 3 | 全利用者の移行を確認してから**削除** | — |
+
+### ② backend では Dependabot に更新 PR を作らせる
+
+[examples/dependabot.yml](../examples/dependabot.yml) を `.github/dependabot.yml` に置くと、schema の main が進むたびに「サブモジュールを最新にする PR」が自動で作られます。PR 検証でコード生成とテストが走るので、**追従が必要かどうかがマージ前に分かります**。人が `git submodule update --remote` を打つ必要はほぼなくなります。
+
+### ③ 自分でスキーマを変えるときは、マージ後に差し替える
+
+自分の機能のためにスキーマを変える場合は、[6-④](06-daily-commands.md#4-バックエンドが指すサブモジュールのコミット-id-を差し替える) の手順です。
+
+1. schema 側で PR を出す
+2. backend では、作業中はその PR のコミットを指して開発する
+3. schema 側でマージされたら、backend の記録を schema の main 側のコミットに差し替える
+
+squash merge でコミット ID が変わるためです。差し替え忘れは、PR 検証の「schema が main にあるか」の検査で止まります。
+

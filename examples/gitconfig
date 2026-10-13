@@ -51,6 +51,8 @@
 	fix  = commit --amend --no-edit
 	# 同期する
 	sync = !git fetch origin && git rebase origin/main
+	# rebase 後の push（自分のブランチ専用）。他人の push を消さないよう --force-with-lease を使う
+	pushf = push --force-with-lease --force-if-includes
 	# 運ぶ（-x を付け忘れないように固定）
 	cp   = cherry-pick -x
 	# 取り消す

@@ -1,0 +1,18 @@
+# backend リポジトリの .github/CODEOWNERS に置く。
+# ブランチ保護で「Require review from Code Owners」を有効にすると、
+# ここに書いたパスを変える PR は、指定チームの承認なしにマージできなくなる。
+#
+# 目的: パイプラインの動き（= 秘密情報や本番へのアクセス）を変えられるファイルを、
+#       担当者のレビューなしに変更させない。
+
+# パイプライン・ビルド・デプロイ（秘密情報と本番環境に触れる）
+/buildspec/         @your-org/platform
+/scripts/           @your-org/platform
+/infra/             @your-org/platform
+/.github/           @your-org/platform
+/justfile           @your-org/platform
+
+# スキーマの参照先（他サービス・フロントエンドにも影響する）
+/.gitmodules        @your-org/platform @your-org/api-owners
+/schema             @your-org/api-owners
+/build.rs           @your-org/api-owners

@@ -251,7 +251,22 @@ Resources:
       Name: !Sub "${PipelineName}-tag"
       ServiceRole: !GetAtt CodeBuildRole.Arn
       EncryptionKey: !GetAtt ArtifactKey.Arn
-      Source: { Type: CODEPIPELINE, BuildSpec: buildspec/tag.yml }
+      # 書き込み権限のトークンを扱うので、buildspec はリポジトリではなくここに固定する（PR で改変できない）
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: |
+          version: 0.2
+          env:
+            shell: bash
+          phases:
+            build:
+              commands:
+                - git config --global user.name  "deploy-pipeline"
+                - git config --global user.email "deploy-pipeline@users.noreply.github.com"
+                - TAG="prod-$(date -u +%Y%m%d-%H%M%S)"
+                - git tag -a "$TAG" -m "Deployed to prod (pipeline execution ${EXECUTION_ID})" "$COMMIT_SHA"
+                - git push "https://x-access-token:${GITHUB_TAG_TOKEN}@github.com/${FULL_REPO}.git" "refs/tags/$TAG"
+                - echo "tagged $COMMIT_SHA as $TAG"
       Artifacts: { Type: CODEPIPELINE }
       Environment:
         Type: LINUX_CONTAINER
@@ -299,7 +314,29 @@ Resources:
       Source:
         Type: GITHUB
         Location: !Sub "https://github.com/${FullRepositoryId}.git"
-        BuildSpec: buildspec/pr.yml
+        # PR の作者が自由に変えられないよう、buildspec はここに固定する。
+        # トークンはサブモジュールの取得にだけ使い、PR のコード（build.rs 等）を動かす前に消す
+        BuildSpec: |
+          version: 0.2
+          env:
+            shell: bash
+          phases:
+            install:
+              commands:
+                - curl -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --component rustfmt,clippy
+                - source "$HOME/.cargo/env"
+            pre_build:
+              commands:
+                - git config --global url."https://x-access-token:${GITHUB_READ_TOKEN}@github.com/".insteadOf "https://github.com/"
+                - git submodule update --init --recursive
+                - git config --global --unset-all url."https://x-access-token:${GITHUB_READ_TOKEN}@github.com/".insteadOf
+                - unset GITHUB_READ_TOKEN
+                - git -C schema merge-base --is-ancestor HEAD origin/main || { echo "schema が schema リポジトリの main にありません"; exit 1; }
+            build:
+              commands:
+                - cargo fmt --check
+                - cargo clippy --all-targets --locked -- -D warnings
+                - cargo test --locked
         ReportBuildStatus: true
         Auth: { Type: CODECONNECTIONS, Resource: !Ref ConnectionArn }
       Artifacts: { Type: NO_ARTIFACTS }

@@ -1,0 +1,16 @@
+# backend リポジトリの .github/dependabot.yml に置く。
+# schema サブモジュールが schema リポジトリの main より古くなったら、
+# 「サブモジュールを最新にする PR」を Dependabot が自動で作る。
+#
+# → PR 検証（CodeBuild）でビルド＝コード生成とテストが走るので、
+#   スキーマの変更に backend が追従できているかがマージ前に分かる。
+version: 2
+updates:
+  - package-ecosystem: gitsubmodule
+    directory: /
+    schedule:
+      interval: daily
+    commit-message:
+      prefix: "chore(schema)"
+    labels: [schema]
+    # private な schema リポジトリを読むには、Dependabot 用のシークレット設定が別途必要

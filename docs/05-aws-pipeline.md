@@ -97,15 +97,17 @@ backend リポジトリに次のように置きます（`examples/` 以下と同
 backend/
 ├── buildspec/
 │   ├── build.yml          検査・テスト・イメージ作成（1 回だけ）
-│   ├── deploy.yml         環境アカウントのロールを引き受けてデプロイ
-│   ├── tag.yml            本番成功後に prod-* タグを打つ
-│   └── pr.yml             PR 検証
+│   └── deploy.yml         環境アカウントのロールを引き受けてデプロイ
+│                          ※ タグ付けと PR 検証の buildspec は、改変防止のため infra/pipeline.yml 側に固定
 ├── scripts/
 │   ├── check-hotfix.sh    hotfix が main からの cherry-pick -x だけか検査
 │   ├── check-schema-pin.sh schema が schema リポジトリの main にあるか検査
 │   └── deploy.sh          デプロイ処理（ECS / Lambda / CDK に合わせて実装）
 ├── infra/
 │   └── pipeline.yml       パイプライン定義
+├── .github/
+│   ├── CODEOWNERS         パイプライン関連ファイルの変更に担当チームの承認を必須化
+│   └── dependabot.yml     schema サブモジュールの更新 PR を自動作成
 ├── schema/                サブモジュール
 └── build.rs
 ```
@@ -135,7 +137,43 @@ CodePipeline の既定のソース出力（zip）には `.git` もサブモジ�
 
 ソースの取得そのものは CodeConnections（GitHub App）が行うので、トークンを使うのはサブモジュールの取得とタグの push だけです。
 
-## 5-7. さらに安全にするなら
+## 5-7. 秘密情報を守る（リポジトリのコードを信用しすぎない）
+
+buildspec や `build.rs` はリポジトリの中にあり、PR で誰でも書き換えられます。**リポジトリのコードが動く場所に秘密情報を置かない**のが原則です。
+
+| 対策 | 内容 |
+|---|---|
+| **権限が要る buildspec はパイプライン定義に固定** | タグ付け（書き込みトークン）と PR 検証（未レビューのコードが動く）の buildspec は、リポジトリではなく `infra/pipeline.yml` に書いています。PR で中身を変えられません |
+| **トークンは使い終わったらすぐ消す** | サブモジュールを取得したら、`cargo build`（= `build.rs` の実行）より前に `unset` し、git の設定からも削除します |
+| **CODEOWNERS** | `buildspec/` `scripts/` `infra/` `.github/` を変える PR は、担当チームの承認を必須にします（[examples/CODEOWNERS](../examples/CODEOWNERS)） |
+| **hotfix の検査は main 側のスクリプトで** | hotfix ブランチ側の `check-hotfix.sh` は改ざんできるため、`git show origin/main:scripts/check-hotfix.sh` を実行します |
+| **短命のトークンに移行する** | 個人用トークン（PAT）は有効期限を短く設定してローテーションします。可能になったら GitHub App のインストールトークン（1 時間で失効）に置き換えます |
+
+> 通常パイプラインの Build は、レビュー済みの main（または検査済みの hotfix）のコードだけを動かすので、buildspec をリポジトリに置いています。それでもトークンは、リポジトリのコードを動かす前に消しています。
+
+## 5-8. 障害対応（ランブック）
+
+| 状況 | 操作 | コマンド |
+|---|---|---|
+| デプロイ自体が失敗した | 自動でロールバックされる（`OnFailure: ROLLBACK`） | — |
+| デプロイは成功したが本番で不具合 | **まず前の成功版へ戻す**（Prod への進行も自動で停止） | `just prod-rollback` |
+| 修正を本番に出せる状態になった | Prod への進行を再開 | `just prod-unfreeze` |
+| hotfix で出す | 通常パイプラインを止めてから hotfix を push | `just prod-freeze` → `git push` |
+
+使っている AWS CLI のコマンド:
+
+```bash
+# Prod への進行を止める / 再開する
+aws codepipeline disable-stage-transition --pipeline-name backend --stage-name Prod --transition-type Inbound --reason "..."
+aws codepipeline enable-stage-transition  --pipeline-name backend --stage-name Prod --transition-type Inbound
+
+# Prod ステージを、指定した過去の実行の版に戻す
+aws codepipeline rollback-stage --pipeline-name backend --stage-name Prod --target-pipeline-execution-id <実行ID>
+```
+
+これらを実行できる IAM 権限は、リリース担当と当番に限定します。
+
+## 5-9. さらに安全にするなら
 
 規模や重要度に応じて追加します。
 
@@ -145,13 +183,16 @@ CodePipeline の既定のソース出力（zip）には `.git` もサブモジ�
 | 段階的な本番展開 | リージョンやセルごとに順番に出す（ウェーブ） |
 | 統合テスト・E2E | Staging ステージに `RunOrder: 2` のテストアクションを追加 |
 | 依存ライブラリの脆弱性検査 | Build に `cargo audit` / `cargo deny` を追加 |
+| サプライチェーン | コミット署名の必須化、イメージ署名（AWS Signer など）とデプロイ時の検証、SBOM の生成、GitHub の秘密情報スキャン（push 時にブロック） |
+| マージキュー | 人数が増えて main が壊れやすくなったら、GitHub の Merge queue を有効にする |
 | 承認の自動化 | テストとアラームが十分に信頼できるようになったら、手動承認を外して完全自動化 |
 | デプロイ時間帯の制限 | V2 のステージ条件で、本番デプロイを平日の日中に限定する |
 
-## 5-8. 導入前に確認すること
+## 5-10. 導入前に確認すること
 
 このテンプレートは cfn-lint で構文を検証済みですが、実際の AWS 環境ではまだデプロイしていません。導入前に次を確認してください。
 
 - `hotfix/*` のトリガーで起動したとき、`#{SourceVariables.BranchName}` が hotfix ブランチ名になること（`check-hotfix.sh` がこれを使う）
 - 完全クローンの出力で、`git fetch` やサブモジュールの取得がトークン経由で通ること
 - `scripts/deploy.sh` を実際のデプロイ方式で実装すること（今は雛形）
+- `just prod-rollback` / `prod-freeze` / `prod-unfreeze` が、実際のパイプラインで意図どおり動くこと（AWS CLI のコマンドは未実行）

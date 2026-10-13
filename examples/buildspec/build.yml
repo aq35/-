@@ -23,11 +23,17 @@ phases:
       - git config --global url."https://x-access-token:${GITHUB_READ_TOKEN}@github.com/".insteadOf "https://github.com/"
       - git submodule update --init --recursive
       - bash scripts/check-schema-pin.sh
-      # hotfix/<本番タグ> の場合、全コミットが main からの cherry-pick -x であることを検査
+      # hotfix/<本番タグ> の場合、全コミットが main からの cherry-pick -x であることを検査。
+      # 検査スクリプトは hotfix ブランチ側ではなく main 側のものを使う（改ざん防止）
       - |
         if [[ "$BRANCH_NAME" == hotfix/* ]]; then
-          GIT_REMOTE="https://github.com/${FULL_REPO}.git" bash scripts/check-hotfix.sh "${BRANCH_NAME#hotfix/}"
+          export GIT_REMOTE="https://github.com/${FULL_REPO}.git"
+          git fetch -q "$GIT_REMOTE" +refs/heads/main:refs/remotes/origin/main
+          git show origin/main:scripts/check-hotfix.sh | bash -s -- "${BRANCH_NAME#hotfix/}"
         fi
+      # ここから先はリポジトリのコード（build.rs 等）を実行するので、トークンを消しておく
+      - git config --global --unset-all url."https://x-access-token:${GITHUB_READ_TOKEN}@github.com/".insteadOf || true
+      - unset GITHUB_READ_TOKEN
       - aws ecr get-login-password | docker login --username AWS --password-stdin "${ECR_REPOSITORY_URI%%/*}"
 
   build:

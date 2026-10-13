@@ -35,13 +35,15 @@ backend/                 ← このリポジトリ（Rust）
 | [examples/infra/pipeline.yml](examples/infra/pipeline.yml) | CodePipeline V2 ＋ CodeBuild の定義（CloudFormation） |
 | [examples/buildspec/](examples/buildspec/) | ビルド・デプロイ・タグ付け・PR 検証の buildspec |
 | [examples/scripts/](examples/scripts/) | hotfix 検査・スキーマ固定検査・デプロイの各スクリプト |
+| [examples/CODEOWNERS](examples/CODEOWNERS) | パイプライン関連ファイルの変更に担当チームの承認を必須化 |
+| [examples/dependabot.yml](examples/dependabot.yml) | schema サブモジュールの更新 PR を自動作成 |
 
 ## 覚えるのは 4 つのルールだけ
 
 1. **すべての変更はまず `main` へ**（Upstream First）
 2. **ビルドは 1 回、同じ成果物を dev → staging → prod へ昇格させる**
 3. **本番に出たらパイプラインがタグ `prod-*` を打つ**（人はタグを打たない）
-4. **緊急修正は本番タグから `hotfix/*` を切り、`cherry-pick -x` で運ぶ**
+4. **本番の不具合はまずロールバック。** 緊急修正が必要なら本番タグから `hotfix/*` を切り、`cherry-pick -x` で運ぶ
 
 スキーマ更新は「サブモジュール更新 ＋ 生成コードの追従」を 1 コミットにまとめます。
 

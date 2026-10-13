@@ -12,6 +12,7 @@
 | 選んでステージ | `git add -p` | `git ap` |
 | コミット | `git commit -m "feat: ..."` | `git ci -m "..."` |
 | main に追従 | `git fetch && git rebase origin/main` | `git sync` |
+| rebase 後に push（自分のブランチ） | `git push --force-with-lease --force-if-includes` | `git pushf` |
 | push | `git push` | — |
 | マージ済みを掃除 | `git switch main && git pull && git fetch --prune` | `just tidy` |
 
@@ -30,9 +31,10 @@
 |---|---|---|
 | 本番に出す | staging を確認 → CodePipeline で「承認」 | — |
 | 今の本番と未リリースの変更を見る | `git log --oneline $(git tag -l 'prod-*' --sort=-refname \| head -1)..origin/main` | `just prod` |
-| 緊急修正を運ぶ | `git switch -c hotfix/<本番タグ> <本番タグ> && git cherry-pick -x <sha>` → `git push` | `just hotfix <sha>` |
-| hotfix の中身を検査 | `bash scripts/check-hotfix.sh <本番タグ>` | （`just hotfix` が実行） |
-| デプロイを戻す | 失敗時は自動ロールバック。手動なら main で `git revert` して流す | — |
+| 緊急修正を運ぶ | `git switch -c hotfix/<本番タグ> <本番タグ> && git cherry-pick -x <sha>` → `just prod-freeze` → `git push` | `just hotfix <sha>` |
+| hotfix の中身を検査 | `git show origin/main:scripts/check-hotfix.sh \| bash -s -- <本番タグ>` | （`just hotfix` が実行） |
+| 本番の不具合を戻す（まずこれ） | 前の成功版へロールバック ＋ Prod への進行を停止 | `just prod-rollback` |
+| Prod への進行を止める / 再開 | `aws codepipeline disable-stage-transition` / `enable-stage-transition` | `just prod-freeze` / `just prod-unfreeze` |
 
 ## 困ったとき
 
