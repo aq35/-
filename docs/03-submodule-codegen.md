@@ -181,9 +181,10 @@ git -C schema diff <本番側のSHA> <main側のSHA> -- schema.graphql         #
 npx @graphql-inspector/cli diff 'git:origin/main:schema.graphql' schema.graphql
 ```
 
-| EN | 読み | JP |
-|---|---|---|
-| Diff the schema against main. | ディフ ザ スキーマ アゲンス(ト) メイン | main のスキーマと比べて、破壊的変更があれば失敗させる |
+| EN | Diff the schema against main. |
+|:---|:---|
+| 読み | ディフ ザ スキーマ アゲンス(ト) メイン |
+| JP | main のスキーマと比べて、破壊的変更があれば失敗させる |
 
 破壊的変更が必要なときは、利用者が追従できるよう段階を分けます。
 
