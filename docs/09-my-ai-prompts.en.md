@@ -3,6 +3,7 @@
 English version of [9. 私用の AI 指示文](09-my-ai-prompts.md). The numbering is the same, so you can switch between the two.
 
 - Each prompt is **one code block**. Copy it with the button at the top right, and replace only the `<...>` parts.
+- **To study the English** (reading and Japanese translation, one sentence at a time, plus a word list), see [英語の学習ページ](en-study/index.md).
 - This file contains the prompts only. For the helper commands (`gh`, `rg`, `git worktree`, ...), the table of commonly misunderstood words, and the flow diagram, see the [Japanese version](09-my-ai-prompts.md).
 - The prompts say "Answer in Japanese." Change it to "Answer in English." if you want English answers.
 
