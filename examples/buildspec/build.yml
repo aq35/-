@@ -1,0 +1,57 @@
+# Build ステージ: 検査 → テスト → イメージを 1 回だけビルドして ECR へ push
+# ここで作ったイメージ（ダイジェスト固定）を dev / staging / prod へ昇格させる。
+#
+# パイプラインから渡される環境変数:
+#   BRANCH_NAME, COMMIT_SHA, FULL_REPO, ECR_REPOSITORY_URI
+#   GITHUB_READ_TOKEN（Secrets Manager。backend と schema の読み取り権限のみ）
+version: 0.2
+
+env:
+  shell: bash
+  exported-variables:
+    - IMAGE_URI
+
+phases:
+  install:
+    commands:
+      - curl -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --component rustfmt,clippy
+      - source "$HOME/.cargo/env"
+
+  pre_build:
+    commands:
+      # private な GitHub リポジトリ（schema サブモジュール等）をトークンで取得できるようにする
+      - git config --global url."https://x-access-token:${GITHUB_READ_TOKEN}@github.com/".insteadOf "https://github.com/"
+      - git submodule update --init --recursive
+      - bash scripts/check-schema-pin.sh
+      # hotfix/<本番タグ> の場合、全コミットが main からの cherry-pick -x であることを検査。
+      # 検査スクリプトは hotfix ブランチ側ではなく main 側のものを使う（改ざん防止）
+      - |
+        if [[ "$BRANCH_NAME" == hotfix/* ]]; then
+          export GIT_REMOTE="https://github.com/${FULL_REPO}.git"
+          git fetch -q "$GIT_REMOTE" +refs/heads/main:refs/remotes/origin/main
+          git show origin/main:scripts/check-hotfix.sh | bash -s -- "${BRANCH_NAME#hotfix/}"
+        fi
+      # ここから先はリポジトリのコード（build.rs 等）を実行するので、トークンを消しておく
+      - git config --global --unset-all url."https://x-access-token:${GITHUB_READ_TOKEN}@github.com/".insteadOf || true
+      - unset GITHUB_READ_TOKEN
+      - aws ecr get-login-password | docker login --username AWS --password-stdin "${ECR_REPOSITORY_URI%%/*}"
+
+  build:
+    commands:
+      - cargo fmt --check
+      - cargo clippy --all-targets --locked -- -D warnings
+      - cargo test --locked
+      # 同じコミットは 2 度ビルドしない（タグは IMMUTABLE。再実行時は既存イメージを使う）
+      - TAG="git-${COMMIT_SHA}"
+      - |
+        if ! aws ecr describe-images --repository-name "${ECR_REPOSITORY_URI#*/}" --image-ids imageTag="$TAG" >/dev/null 2>&1; then
+          docker build -t "${ECR_REPOSITORY_URI}:${TAG}" .
+          docker push "${ECR_REPOSITORY_URI}:${TAG}"
+        fi
+
+  post_build:
+    commands:
+      # 以降のステージにはタグではなくダイジェストで渡す（中身が変わらないことを保証）
+      - DIGEST=$(aws ecr describe-images --repository-name "${ECR_REPOSITORY_URI#*/}" --image-ids imageTag="$TAG" --query 'imageDetails[0].imageDigest' --output text)
+      - export IMAGE_URI="${ECR_REPOSITORY_URI}@${DIGEST}"
+      - echo "IMAGE_URI=$IMAGE_URI"

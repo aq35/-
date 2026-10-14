@@ -1,0 +1,97 @@
+# よく使う Git 操作を 1 コマンドにまとめたタスク定義
+# https://github.com/casey/just  （インストール: cargo install just）
+#
+# backend リポジトリのルートに `justfile` として置いて使う。
+# `just` だけで一覧を表示。
+
+pipeline := "backend"
+
+default:
+    @just --list
+
+# 初回セットアップ（サブモジュール取得）
+setup:
+    git submodule update --init --recursive
+
+# 最新の main から作業ブランチを作る  例: just start feat/user-search
+start branch:
+    git fetch origin
+    git switch -c {{branch}} origin/main
+
+# マージ済み（リモートで削除済み）のローカルブランチを掃除
+tidy:
+    git switch main
+    git pull
+    git fetch --prune
+    git for-each-ref --format '%(refname:short) %(upstream:track)' refs/heads \
+      | awk '$2 == "[gone]" { print $1 }' \
+      | xargs -r git branch -D
+
+# スキーマを最新にしてビルド（生成）する
+schema-bump:
+    git submodule update --remote schema
+    git diff --submodule=log -- schema
+    cargo build
+    @echo ""
+    @echo "問題なければ:"
+    @echo "  git add schema src/ && git commit -m \"chore(schema): スキーマを $(git -C schema rev-parse --short HEAD) に更新\""
+
+# 本番の状況（最新の本番タグと、まだ本番に出ていない main のコミット）
+prod:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    git fetch -q origin --tags
+    tag=$(git tag -l 'prod-*' --sort=-refname | head -1)
+    echo "本番: $tag ($(git log -1 --format='%h %s' "$tag"))"
+    echo "未リリース:"
+    git log --oneline "$tag..origin/main"
+
+# 緊急修正: 最新の本番タグから hotfix ブランチを切り、main の修正を運ぶ  例: just hotfix 9f8e7d6
+hotfix +shas:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    git fetch -q origin --tags
+    tag=$(git tag -l 'prod-*' --sort=-refname | head -1)
+    git switch -c "hotfix/$tag" "$tag"
+    git cherry-pick -x {{shas}}
+    git submodule update --init --recursive   # cherry-pick はサブモジュールの中身を更新しないため
+    git show origin/main:scripts/check-hotfix.sh | bash -s -- "$tag"   # CI と同じく main 側の検査を使う
+    echo ""
+    echo "問題なければ:"
+    echo "  1. just prod-freeze   （通常パイプラインが本番に進まないよう止める）"
+    echo "  2. git push           （hotfix 用パイプラインが起動）"
+    echo "  3. 本番反映後に just prod-unfreeze"
+
+# 通常パイプラインの Prod への進行を止める（hotfix 中・障害対応中）  例: just prod-freeze "hotfix 対応中"
+prod-freeze reason="hotfix in progress":
+    aws codepipeline disable-stage-transition --pipeline-name {{pipeline}} \
+      --stage-name Prod --transition-type Inbound --reason "{{reason}}"
+    @echo "{{pipeline}} の Prod への進行を停止しました（解除: just prod-unfreeze）"
+
+# Prod への進行を再開する
+prod-unfreeze:
+    aws codepipeline enable-stage-transition --pipeline-name {{pipeline}} \
+      --stage-name Prod --transition-type Inbound
+    @echo "{{pipeline}} の Prod への進行を再開しました"
+
+# 障害時の第一手: 本番を以前の成功版に戻す（省略時は 1 つ前の成功版）  例: just prod-rollback
+prod-rollback execution="":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "直近の成功した実行:"
+    aws codepipeline list-pipeline-executions --pipeline-name {{pipeline}} --max-items 20 \
+      --query "pipelineExecutionSummaries[?status=='Succeeded'] | [:5].[pipelineExecutionId, lastUpdateTime, sourceRevisions[0].revisionSummary]" \
+      --output table
+    target="{{execution}}"
+    if [[ -z $target ]]; then
+      target=$(aws codepipeline list-pipeline-executions --pipeline-name {{pipeline}} --max-items 20 \
+        --query "pipelineExecutionSummaries[?status=='Succeeded'] | [1].pipelineExecutionId" --output text)
+    fi
+    read -r -p "Prod を実行 $target の版に戻します。よろしいですか？ [y/N] " ok
+    [[ $ok == y ]] || exit 1
+    # 戻した直後に新しいコミットが Prod へ進まないよう、先に止める
+    aws codepipeline disable-stage-transition --pipeline-name {{pipeline}} \
+      --stage-name Prod --transition-type Inbound --reason "rolled back to $target"
+    aws codepipeline rollback-stage --pipeline-name {{pipeline}} \
+      --stage-name Prod --target-pipeline-execution-id "$target"
+    echo "ロールバックを開始しました。原因を main で修正したら just prod-unfreeze"

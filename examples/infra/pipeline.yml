@@ -1,0 +1,464 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  backend のデプロイパイプライン（ツール用アカウントに作成）。
+  Build once → dev → staging → 手動承認 → prod の順に同じイメージを昇格させる。
+  同じテンプレートから 2 スタック作る:
+    - 通常:   PipelineName=backend         TriggerBranches=main
+    - 緊急:   PipelineName=backend-hotfix  TriggerBranches=hotfix/*
+
+Parameters:
+  PipelineName:
+    Type: String
+    Default: backend
+  TriggerBranches:
+    Type: CommaDelimitedList
+    Default: main
+    Description: パイプラインを起動するブランチ（glob 可。例 main / hotfix/*）
+  SourceBranch:
+    Type: String
+    Default: main
+    Description: ソースアクションの既定ブランチ（手動実行時に使われる）
+  ConnectionArn:
+    Type: String
+    Description: GitHub への CodeConnections 接続の ARN
+  FullRepositoryId:
+    Type: String
+    Description: owner/backend
+  DevAccountId:
+    Type: String
+  StagingAccountId:
+    Type: String
+  ProdAccountId:
+    Type: String
+  DeployRoleName:
+    Type: String
+    Default: backend-deploy
+    Description: 各環境アカウントに作成済みのデプロイ用ロール名
+  GitHubReadTokenSecretArn:
+    Type: String
+    Description: backend と schema の読み取り権限を持つトークン（Secrets Manager）
+  GitHubTagTokenSecretArn:
+    Type: String
+    Description: backend の contents:write のみを持つトークン（Secrets Manager）
+  CreateSharedResources:
+    Type: String
+    AllowedValues: ["true", "false"]
+    Default: "true"
+    Description: ECR / PR 検証プロジェクトを作るか（hotfix 用スタックでは false）
+  EcrRepositoryName:
+    Type: String
+    Default: backend
+
+Conditions:
+  Shared: !Equals [!Ref CreateSharedResources, "true"]
+
+Resources:
+  # ---------------------------------------------------------------- 成果物
+  ArtifactKey:
+    Type: AWS::KMS::Key
+    Properties:
+      EnableKeyRotation: true
+      KeyPolicy:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: { AWS: !Sub "arn:${AWS::Partition}:iam::${AWS::AccountId}:root" }
+            Action: kms:*
+            Resource: "*"
+
+  ArtifactBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: aws:kms
+              KMSMasterKeyID: !GetAtt ArtifactKey.Arn
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration: { Status: Enabled }
+      LifecycleConfiguration:
+        Rules:
+          - Id: expire-old-artifacts
+            Status: Enabled
+            ExpirationInDays: 90
+            NoncurrentVersionExpiration: { NoncurrentDays: 30 }
+
+  ArtifactBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref ArtifactBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: DenyInsecureTransport
+            Effect: Deny
+            Principal: "*"
+            Action: s3:*
+            Resource:
+              - !GetAtt ArtifactBucket.Arn
+              - !Sub "${ArtifactBucket.Arn}/*"
+            Condition: { Bool: { aws:SecureTransport: "false" } }
+
+  # イメージはタグ変更不可・push 時スキャン。各環境アカウントから pull だけ許可。
+  EcrRepository:
+    Type: AWS::ECR::Repository
+    Condition: Shared
+    Properties:
+      RepositoryName: !Ref EcrRepositoryName
+      ImageTagMutability: IMMUTABLE
+      ImageScanningConfiguration: { ScanOnPush: true }
+      EncryptionConfiguration: { EncryptionType: KMS }
+      RepositoryPolicyText:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowEnvironmentAccountsPull
+            Effect: Allow
+            Principal:
+              AWS:
+                - !Sub "arn:${AWS::Partition}:iam::${DevAccountId}:root"
+                - !Sub "arn:${AWS::Partition}:iam::${StagingAccountId}:root"
+                - !Sub "arn:${AWS::Partition}:iam::${ProdAccountId}:root"
+            Action:
+              - ecr:BatchGetImage
+              - ecr:GetDownloadUrlForLayer
+
+  # ---------------------------------------------------------------- IAM（最小権限）
+  CodeBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: { Service: codebuild.amazonaws.com }
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: codebuild
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: [logs:CreateLogGroup, logs:CreateLogStream, logs:PutLogEvents]
+                Resource: !Sub "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${PipelineName}-*"
+              - Effect: Allow
+                Action: [s3:GetObject, s3:GetObjectVersion, s3:PutObject]
+                Resource: !Sub "${ArtifactBucket.Arn}/*"
+              - Effect: Allow
+                Action: [kms:Decrypt, kms:Encrypt, kms:GenerateDataKey*]
+                Resource: !GetAtt ArtifactKey.Arn
+              - Effect: Allow
+                Action: [codeconnections:UseConnection, codestar-connections:UseConnection]
+                Resource: !Ref ConnectionArn
+              - Effect: Allow
+                Action: secretsmanager:GetSecretValue
+                Resource: [!Ref GitHubReadTokenSecretArn, !Ref GitHubTagTokenSecretArn]
+              - Effect: Allow
+                Action: ecr:GetAuthorizationToken
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:CompleteLayerUpload
+                  - ecr:DescribeImages
+                  - ecr:InitiateLayerUpload
+                  - ecr:PutImage
+                  - ecr:UploadLayerPart
+                Resource: !Sub "arn:${AWS::Partition}:ecr:${AWS::Region}:${AWS::AccountId}:repository/${EcrRepositoryName}"
+              - Effect: Allow
+                Action: sts:AssumeRole
+                Resource:
+                  - !Sub "arn:${AWS::Partition}:iam::${DevAccountId}:role/${DeployRoleName}"
+                  - !Sub "arn:${AWS::Partition}:iam::${StagingAccountId}:role/${DeployRoleName}"
+                  - !Sub "arn:${AWS::Partition}:iam::${ProdAccountId}:role/${DeployRoleName}"
+
+  PipelineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: { Service: codepipeline.amazonaws.com }
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: pipeline
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: [s3:GetObject, s3:GetObjectVersion, s3:PutObject, s3:GetBucketVersioning]
+                Resource: [!GetAtt ArtifactBucket.Arn, !Sub "${ArtifactBucket.Arn}/*"]
+              - Effect: Allow
+                Action: [kms:Decrypt, kms:Encrypt, kms:GenerateDataKey*]
+                Resource: !GetAtt ArtifactKey.Arn
+              - Effect: Allow
+                Action: [codeconnections:UseConnection, codestar-connections:UseConnection]
+                Resource: !Ref ConnectionArn
+              - Effect: Allow
+                Action: [codebuild:StartBuild, codebuild:BatchGetBuilds]
+                Resource:
+                  - !GetAtt BuildProject.Arn
+                  - !GetAtt DeployProject.Arn
+                  - !GetAtt TagProject.Arn
+
+  # ---------------------------------------------------------------- CodeBuild
+  BuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: !Sub "${PipelineName}-build"
+      ServiceRole: !GetAtt CodeBuildRole.Arn
+      EncryptionKey: !GetAtt ArtifactKey.Arn
+      Source: { Type: CODEPIPELINE, BuildSpec: buildspec/build.yml }
+      Artifacts: { Type: CODEPIPELINE }
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_LARGE
+        Image: aws/codebuild/standard:7.0
+        PrivilegedMode: true # docker build のため
+        EnvironmentVariables:
+          - Name: ECR_REPOSITORY_URI
+            Value: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${EcrRepositoryName}"
+          - Name: FULL_REPO
+            Value: !Ref FullRepositoryId
+          - Name: GITHUB_READ_TOKEN
+            Type: SECRETS_MANAGER
+            Value: !Ref GitHubReadTokenSecretArn
+      Cache: { Type: LOCAL, Modes: [LOCAL_DOCKER_LAYER_CACHE, LOCAL_SOURCE_CACHE] }
+
+  DeployProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: !Sub "${PipelineName}-deploy"
+      ServiceRole: !GetAtt CodeBuildRole.Arn
+      EncryptionKey: !GetAtt ArtifactKey.Arn
+      Source: { Type: CODEPIPELINE, BuildSpec: buildspec/deploy.yml }
+      Artifacts: { Type: CODEPIPELINE }
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:7.0
+        EnvironmentVariables:
+          - Name: DEPLOY_ROLE_NAME
+            Value: !Ref DeployRoleName
+
+  TagProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: !Sub "${PipelineName}-tag"
+      ServiceRole: !GetAtt CodeBuildRole.Arn
+      EncryptionKey: !GetAtt ArtifactKey.Arn
+      # 書き込み権限のトークンを扱うので、buildspec はリポジトリではなくここに固定する（PR で改変できない）
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: |
+          version: 0.2
+          env:
+            shell: bash
+          phases:
+            build:
+              commands:
+                - git config --global user.name  "deploy-pipeline"
+                - git config --global user.email "deploy-pipeline@users.noreply.github.com"
+                - TAG="prod-$(date -u +%Y%m%d-%H%M%S)"
+                - git tag -a "$TAG" -m "Deployed to prod (pipeline execution ${EXECUTION_ID})" "$COMMIT_SHA"
+                - git push "https://x-access-token:${GITHUB_TAG_TOKEN}@github.com/${FULL_REPO}.git" "refs/tags/$TAG"
+                - echo "tagged $COMMIT_SHA as $TAG"
+      Artifacts: { Type: CODEPIPELINE }
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:7.0
+        EnvironmentVariables:
+          - Name: FULL_REPO
+            Value: !Ref FullRepositoryId
+          - Name: GITHUB_TAG_TOKEN
+            Type: SECRETS_MANAGER
+            Value: !Ref GitHubTagTokenSecretArn
+
+  # PR ごとの検証（結果は GitHub の PR チェックに表示される）
+  PrCheckRole:
+    Type: AWS::IAM::Role
+    Condition: Shared
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: { Service: codebuild.amazonaws.com }
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: pr-check
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: [logs:CreateLogGroup, logs:CreateLogStream, logs:PutLogEvents]
+                Resource: !Sub "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${PipelineName}-pr-check*"
+              - Effect: Allow
+                Action: [codeconnections:UseConnection, codeconnections:GetConnectionToken, codestar-connections:UseConnection, codestar-connections:GetConnectionToken]
+                Resource: !Ref ConnectionArn
+              - Effect: Allow
+                Action: secretsmanager:GetSecretValue
+                Resource: !Ref GitHubReadTokenSecretArn
+
+  PrCheckProject:
+    Type: AWS::CodeBuild::Project
+    Condition: Shared
+    Properties:
+      Name: !Sub "${PipelineName}-pr-check"
+      ServiceRole: !GetAtt PrCheckRole.Arn
+      Source:
+        Type: GITHUB
+        Location: !Sub "https://github.com/${FullRepositoryId}.git"
+        # PR の作者が自由に変えられないよう、buildspec はここに固定する。
+        # トークンはサブモジュールの取得にだけ使い、PR のコード（build.rs 等）を動かす前に消す
+        BuildSpec: |
+          version: 0.2
+          env:
+            shell: bash
+          phases:
+            install:
+              commands:
+                - curl -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --component rustfmt,clippy
+                - source "$HOME/.cargo/env"
+            pre_build:
+              commands:
+                - git config --global url."https://x-access-token:${GITHUB_READ_TOKEN}@github.com/".insteadOf "https://github.com/"
+                - git submodule update --init --recursive
+                - git config --global --unset-all url."https://x-access-token:${GITHUB_READ_TOKEN}@github.com/".insteadOf
+                - unset GITHUB_READ_TOKEN
+                - git -C schema merge-base --is-ancestor HEAD origin/main || { echo "schema が schema リポジトリの main にありません"; exit 1; }
+            build:
+              commands:
+                - cargo fmt --check
+                - cargo clippy --all-targets --locked -- -D warnings
+                - cargo test --locked
+        ReportBuildStatus: true
+        Auth: { Type: CODECONNECTIONS, Resource: !Ref ConnectionArn }
+      Artifacts: { Type: NO_ARTIFACTS }
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_LARGE
+        Image: aws/codebuild/standard:7.0
+        EnvironmentVariables:
+          - Name: GITHUB_READ_TOKEN
+            Type: SECRETS_MANAGER
+            Value: !Ref GitHubReadTokenSecretArn
+      Triggers:
+        Webhook: true
+        FilterGroups:
+          - - Type: EVENT
+              Pattern: PULL_REQUEST_CREATED,PULL_REQUEST_UPDATED,PULL_REQUEST_REOPENED
+            - Type: BASE_REF
+              Pattern: ^refs/heads/main$
+
+  # ---------------------------------------------------------------- パイプライン
+  Pipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: !Ref PipelineName
+      PipelineType: V2
+      ExecutionMode: SUPERSEDED
+      RoleArn: !GetAtt PipelineRole.Arn
+      ArtifactStore:
+        Type: S3
+        Location: !Ref ArtifactBucket
+        EncryptionKey: { Id: !GetAtt ArtifactKey.Arn, Type: KMS }
+      Triggers:
+        - ProviderType: CodeStarSourceConnection
+          GitConfiguration:
+            SourceActionName: Source
+            Push:
+              - Branches:
+                  Includes: !Ref TriggerBranches
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: Source
+              Namespace: SourceVariables
+              ActionTypeId: { Category: Source, Owner: AWS, Provider: CodeStarSourceConnection, Version: "1" }
+              Configuration:
+                ConnectionArn: !Ref ConnectionArn
+                FullRepositoryId: !Ref FullRepositoryId
+                BranchName: !Ref SourceBranch
+                DetectChanges: false # 起動はトリガー定義に任せる
+                OutputArtifactFormat: CODEBUILD_CLONE_REF # .git ごと渡す（サブモジュール取得・タグ付けに必要）
+              OutputArtifacts: [{ Name: Src }]
+
+        - Name: Build
+          Actions:
+            - Name: Build
+              Namespace: BuildVariables
+              ActionTypeId: { Category: Build, Owner: AWS, Provider: CodeBuild, Version: "1" }
+              Configuration:
+                ProjectName: !Ref BuildProject
+                EnvironmentVariables: >-
+                  [{"name":"BRANCH_NAME","value":"#{SourceVariables.BranchName}"},
+                   {"name":"COMMIT_SHA","value":"#{SourceVariables.CommitId}"}]
+              InputArtifacts: [{ Name: Src }]
+
+        - Name: Dev
+          OnFailure: { Result: ROLLBACK }
+          Actions:
+            - Name: Deploy
+              ActionTypeId: { Category: Build, Owner: AWS, Provider: CodeBuild, Version: "1" }
+              Configuration:
+                ProjectName: !Ref DeployProject
+                EnvironmentVariables: !Sub >-
+                  [{"name":"TARGET_ENV","value":"dev"},
+                   {"name":"TARGET_ACCOUNT_ID","value":"${DevAccountId}"},
+                   {"name":"IMAGE_URI","value":"#{BuildVariables.IMAGE_URI}"}]
+              InputArtifacts: [{ Name: Src }]
+
+        - Name: Staging
+          OnFailure: { Result: ROLLBACK }
+          Actions:
+            - Name: Deploy
+              ActionTypeId: { Category: Build, Owner: AWS, Provider: CodeBuild, Version: "1" }
+              Configuration:
+                ProjectName: !Ref DeployProject
+                EnvironmentVariables: !Sub >-
+                  [{"name":"TARGET_ENV","value":"staging"},
+                   {"name":"TARGET_ACCOUNT_ID","value":"${StagingAccountId}"},
+                   {"name":"IMAGE_URI","value":"#{BuildVariables.IMAGE_URI}"}]
+              InputArtifacts: [{ Name: Src }]
+              RunOrder: 1
+            # 統合テスト・E2E をここに追加（RunOrder: 2）
+
+        - Name: Approval
+          Actions:
+            - Name: ApproveProd
+              ActionTypeId: { Category: Approval, Owner: AWS, Provider: Manual, Version: "1" }
+              Configuration:
+                CustomData: "staging を確認して本番リリースを承認してください: #{SourceVariables.CommitMessage}"
+
+        - Name: Prod
+          OnFailure: { Result: ROLLBACK }
+          Actions:
+            - Name: Deploy
+              ActionTypeId: { Category: Build, Owner: AWS, Provider: CodeBuild, Version: "1" }
+              Configuration:
+                ProjectName: !Ref DeployProject
+                EnvironmentVariables: !Sub >-
+                  [{"name":"TARGET_ENV","value":"prod"},
+                   {"name":"TARGET_ACCOUNT_ID","value":"${ProdAccountId}"},
+                   {"name":"IMAGE_URI","value":"#{BuildVariables.IMAGE_URI}"}]
+              InputArtifacts: [{ Name: Src }]
+              RunOrder: 1
+            - Name: Tag
+              ActionTypeId: { Category: Build, Owner: AWS, Provider: CodeBuild, Version: "1" }
+              Configuration:
+                ProjectName: !Ref TagProject
+                EnvironmentVariables: >-
+                  [{"name":"COMMIT_SHA","value":"#{SourceVariables.CommitId}"},
+                   {"name":"EXECUTION_ID","value":"#{codepipeline.PipelineExecutionId}"}]
+              InputArtifacts: [{ Name: Src }]
+              RunOrder: 2
+
+Outputs:
+  PipelineUrl:
+    Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/codesuite/codepipeline/pipelines/${Pipeline}/view"
