@@ -16,7 +16,7 @@
 
 ## [How to find the commands]（コマンドの見つけ方）
 
-読み: ハウ トゥ ファインド ザ コマンズ
+読み: ハウ トゥ ファインド ザ コマンズ ／ つながり: なし（単語ごとに区切って読む）
 
 | EN | Find this project's commands‿in this‿order. |
 |:---|:---|
@@ -62,7 +62,7 @@
 
 ## [Steps]（手順）
 
-読み: ステップス
+読み: ステップス ／ つながり: なし（単語ごとに区切って読む）
 
 | EN | Before the changes (the baseline state), run the three and record the results. |
 |:---|:---|
@@ -132,7 +132,7 @@
 
 ## [Do not]（やってはいけないこと）
 
-読み: ドゥー ノッ(ト)
+読み: ドゥー ノッ(ト) ／ つながり: なし（単語ごとに区切って読む）
 
 | EN | Silence lint warnings by disabling them |
 |:---|:---|

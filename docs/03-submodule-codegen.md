@@ -184,6 +184,7 @@ npx @graphql-inspector/cli diff 'git:origin/main:schema.graphql' schema.graphql
 | EN | Diff the schema against main. |
 |:---|:---|
 | 読み | ディフ ザ スキーマ アゲンス(ト) メイン |
+| つながり | なし（単語ごとに区切って読む） |
 | JP | main のスキーマと比べて、破壊的変更があれば失敗させる |
 
 破壊的変更が必要なときは、利用者が追従できるよう段階を分けます。

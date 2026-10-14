@@ -22,7 +22,7 @@
 
 ## [Premise]（前提）
 
-読み: プレミス
+読み: プレミス ／ つながり: なし（単語ごとに区切って読む）
 
 | EN | The source‿of truth for the spec‿is "what the code‿does now". |
 |:---|:---|
@@ -42,9 +42,9 @@
 | つながり | なし（単語ごとに区切って読む） |
 | JP | コードは変更しないでください。 |
 
-## [What to investigate]（調べる内容）
+## [What‿to investigate]（調べる内容）
 
-読み: ワッ(ト) トゥ インヴェスティゲイ(ト)
+読み: ワッ‿トゥ インヴェスティゲイ(ト) ／ つながり: What‿to（同じ・似た子音が続く（前の音は言わない））
 
 | EN | Purpose (what the feature‿is for, as far‿as the code shows) |
 |:---|:---|
@@ -90,7 +90,7 @@
 
 ## [How to write]（書き方）
 
-読み: ハウ トゥ ライ(ト)
+読み: ハウ トゥ ライ(ト) ／ つながり: なし（単語ごとに区切って読む）
 
 | EN | Attach‿evidence to every item: file path‿and line‿number. |
 |:---|:---|

@@ -6,9 +6,10 @@
 
 各コマンドの下に、英語・読み方・日本語訳を付けています。
 
-| EN | コマンドの意味を英語で（`‿` は音がつながる＝リンキングする箇所） |
+| EN | コマンドの意味を英語で（`‿` は音がつながる＝リンキングする場所） |
 |:---|:---|
-| 読み | リンキングを反映したカタカナ読み（`(ト)` は弱くなる・ほぼ発音しない音） |
+| 読み | カタカナ読み。英文と同じ位置に `‿` を入れています（`(ト)` は弱くなる・ほぼ発音しない音） |
+| つながり | どの単語と単語が、どの型でつながるか（[リンキングの解説](en-study/linking.md)） |
 | JP | 日本語訳 |
 
 - サブモジュールのディレクトリ名は `schema` としています
@@ -20,9 +21,10 @@
 git -C schema status
 ```
 
-| EN | Run git‿as‿if it‿started‿in schema. |
+| EN | Run git‿as‿if‿it started‿in schema. |
 |:---|:---|
-| 読み | ラン ギッタズィフ イッスターティッディン スキーマ |
+| 読み | ラン ギッ‿タ‿ズィ‿フィッ(ト) スターティッ‿ディン スキーマ |
+| つながり | git‿as（t＋母音（t がラ行に近い音になる）） ／ as‿if（子音＋母音） ／ if‿it（子音＋母音） ／ started‿in（子音＋母音） |
 | JP | git を、schema ディレクトリで起動したかのように実行する |
 
 - `-C` は **Change directory**（チェインジ ディレクトリー＝ディレクトリを変える）の頭文字です
@@ -68,9 +70,10 @@ git -C schema status
 pwd && git rev-parse --show-toplevel && git -C schema rev-parse --show-toplevel
 ```
 
-| EN | Show where‿I am, and the top‿of each repository. |
+| EN | Show where‿I am, and the top‿of‿each repository. |
 |:---|:---|
-| 読み | ショウ ウェアライ アム アン(ド) ザ トッポヴ イーチ リポジトリー |
+| 読み | ショウ ウェア‿ライ アム、アン(ド) ザ ト‿ポ‿ヴィーチ リポズィトリー |
+| つながり | where‿I（r＋母音） ／ top‿of（子音＋母音） ／ of‿each（子音＋母音） |
 | JP | 今いる場所と、backend・schema それぞれのリポジトリの最上位ディレクトリを表示する |
 
 ```
@@ -143,27 +146,30 @@ pwd && git rev-parse --show-toplevel && git -C schema rev-parse --show-toplevel
 git switch main
 ```
 
-| EN | Switch‿to main. |
+| EN | Switch to main. |
 |:---|:---|
 | 読み | スウィッチュ トゥ メイン |
+| つながり | なし（単語ごとに区切って読む） |
 | JP | main ブランチに切り替える |
 
 ```bash
 git pull
 ```
 
-| EN | Pull the latest‿changes. |
+| EN | Pull the latest changes. |
 |:---|:---|
 | 読み | プル ザ レイテス(ト)チェインジズ |
+| つながり | なし（単語ごとに区切って読む） |
 | JP | リモートの最新を取り込む |
 
 ```bash
 git submodule update --init --recursive
 ```
 
-| EN | Update‿all submodules to the recorded‿commit. |
+| EN | Update‿all submodules to the recorded commit. |
 |:---|:---|
-| 読み | アップデイロール サブモジュールズ トゥ ザ リコーディッ(ド)カミッ(ト) |
+| 読み | アップデイ‿ロール サブモジュールズ トゥ ザ リコーディッ(ド) カミッ(ト) |
+| つながり | Update‿all（t＋母音（t がラ行に近い音になる）） |
 | JP | すべてのサブモジュールを、親が記録しているコミットに揃える |
 
 3 つをまとめて実行する場合:
@@ -180,7 +186,8 @@ git submodule status
 
 | EN | Show the status‿of submodules. |
 |:---|:---|
-| 読み | ショウ ザ ステイタソヴ サブモジュールズ |
+| 読み | ショウ ザ ステイタ‿ソヴ サブモジュールズ |
+| つながり | status‿of（子音＋母音） |
 | JP | サブモジュールが指しているコミットを表示する |
 
 ```
@@ -195,9 +202,10 @@ git submodule status
 echo "記録: $(git rev-parse --short HEAD:schema)  実際: $(git -C schema rev-parse --short HEAD)"
 ```
 
-| EN | Compare the recorded‿and‿actual‿commits. |
+| EN | Compare the recorded‿and‿actual commits. |
 |:---|:---|
-| 読み | カンペア ザ リコーディダンダクチュアル カミッツ |
+| 読み | カンペア ザ リコーディッ‿ダン‿ダクチュアル カミッツ |
+| つながり | recorded‿and（子音＋母音） ／ and‿actual（子音＋母音） |
 | JP | 記録されたコミットと実際のコミットを比べる |
 
 ```
@@ -208,9 +216,10 @@ echo "記録: $(git rev-parse --short HEAD:schema)  実際: $(git -C schema rev-
 git -C schema log --oneline -1
 ```
 
-| EN | Show the latest‿commit‿in schema. |
+| EN | Show the latest commit‿in schema. |
 |:---|:---|
-| 読み | ショウ ザ レイテス(ト)カミッティン スキーマ |
+| 読み | ショウ ザ レイテス(ト) カミッ‿ティン スキーマ |
+| つながり | commit‿in（t＋母音（t がラ行に近い音になる）） |
 | JP | schema が今いるコミットを 1 件表示する |
 
 ### 原理: なぜ `pull` だけではサブモジュールが古いままなのか
@@ -233,7 +242,8 @@ git config --global submodule.recurse true
 
 | EN | Recurse‿into submodules‿automatically. |
 |:---|:---|
-| 読み | リカーサントゥ サブモジュールゾートマティカリー |
+| 読み | リカー‿サントゥ サブモジュール‿ゾートマティカリー |
+| つながり | Recurse‿into（子音＋母音） ／ submodules‿automatically（子音＋母音） |
 | JP | サブモジュールにも自動で反映する |
 
 これで `git pull` や `git switch` のときに、サブモジュールも自動で揃います。
@@ -256,9 +266,10 @@ git config --global submodule.recurse true
 git status -sb
 ```
 
-| EN | Show a short‿status with the branch. |
+| EN | Show a short status with the branch. |
 |:---|:---|
 | 読み | ショウ ア ショー(ト)ステイタス ウィズ ザ ブランチ |
+| つながり | なし（単語ごとに区切って読む） |
 | JP | 変更ファイルの一覧を短く表示する（ブランチ名つき） |
 
 ```
@@ -271,27 +282,30 @@ git status -sb
 git diff --stat
 ```
 
-| EN | Show a summary‿of changes. |
+| EN | Show a summary of changes. |
 |:---|:---|
 | 読み | ショウ ア サマリオヴ チェインジズ |
+| つながり | なし（単語ごとに区切って読む） |
 | JP | どのファイルが何行変わったかの要約を表示する |
 
 ```bash
 git diff
 ```
 
-| EN | Show unstaged‿changes. |
+| EN | Show unstaged changes. |
 |:---|:---|
 | 読み | ショウ アンステイジ(ド)チェインジズ |
+| つながり | なし（単語ごとに区切って読む） |
 | JP | まだステージしていない変更の中身を表示する |
 
 ```bash
 git diff --staged
 ```
 
-| EN | Show staged‿changes — what‿will be committed. |
+| EN | Show staged changes — what will be committed. |
 |:---|:---|
 | 読み | ショウ ステイジ(ド)チェインジズ ワッウィル ビー カミティッド |
+| つながり | なし（単語ごとに区切って読む） |
 | JP | ステージ済みの変更（次のコミットに入る内容）を表示する |
 
 ### サブモジュールの差分を確認する
@@ -300,9 +314,10 @@ git diff --staged
 git diff --submodule=log
 ```
 
-| EN | Show submodule‿changes‿as a log. |
+| EN | Show submodule changes‿as‿a log. |
 |:---|:---|
-| 読み | ショウ サブモジュー(ル)チェインジザザ ログ |
+| 読み | ショウ サブモジュー(ル) チェインジ‿ザ‿ザ ログ |
+| つながり | changes‿as（子音＋母音） ／ as‿a（子音＋母音） |
 | JP | サブモジュールの変化を、コミット一覧で表示する |
 
 ```
@@ -314,9 +329,10 @@ Submodule schema 970d12c..3d9c0f3:
 git diff --submodule=diff
 ```
 
-| EN | Show the actual‿file‿changes‿inside the submodule. |
+| EN | Show the actual file changes‿inside the submodule. |
 |:---|:---|
-| 読み | ショウ ジ アクチュアル ファイ(ル)チェインジズィンサイ(ド) ザ サブモジュール |
+| 読み | ショウ ジ アクチュアル ファイ(ル) チェインジ‿ズィンサイ(ド) ザ サブモジュール |
+| つながり | changes‿inside（子音＋母音） |
 | JP | サブモジュールの中のファイル差分まで表示する（スキーマの差分そのもの） |
 
 ```diff
@@ -335,25 +351,28 @@ git fetch && git log --oneline origin/main..HEAD
 
 | EN | List the commits‿on my branch that‿aren't‿on main. |
 |:---|:---|
-| 読み | リス(ト) ザ カミッツォン マイ ブランチ ザラーントン メイン |
+| 読み | リス(ト) ザ カミッ‿ツォン マイ ブランチ ザ‿ラーン‿トン メイン |
+| つながり | commits‿on（子音＋母音） ／ that‿aren't（t＋母音（t がラ行に近い音になる）） ／ aren't‿on（t＋母音（t がラ行に近い音になる）） |
 | JP | main に無く、自分のブランチにだけあるコミットを一覧する |
 
 ```bash
 git diff --stat origin/main...HEAD
 ```
 
-| EN | Show what‿my branch changed since‿it branched‿off. |
+| EN | Show what my branch changed since‿it branched‿off. |
 |:---|:---|
-| 読み | ショウ ワッマイ ブランチ チェインジ(ド) スィンスィッ(ト) ブランチトフ |
+| 読み | ショウ ワッ(ト) マイ ブランチ チェインジ(ド) スィン‿スィッ(ト) ブランチ‿トフ |
+| つながり | since‿it（子音＋母音） ／ branched‿off（子音＋母音） |
 | JP | 分岐してから自分のブランチで変えた内容を表示する（PR の差分と同じ） |
 
 ```bash
 git diff --check
 ```
 
-| EN | Check‿for whitespace‿errors. |
+| EN | Check for whitespace‿errors. |
 |:---|:---|
-| 読み | チェッフォー ワイ(ト)スペイセラーズ |
+| 読み | チェック フォー ワイ(ト)スペイ‿セラーズ |
+| つながり | whitespace‿errors（子音＋母音） |
 | JP | 行末の空白などのミスを検出する |
 
 ### 原理: `..`（ドット 2 つ）と `...`（ドット 3 つ）の違い
@@ -390,18 +409,20 @@ git diff --check
 git -C schema fetch origin
 ```
 
-| EN | Fetch the latest‿from origin‿in schema. |
+| EN | Fetch the latest from‿origin‿in schema. |
 |:---|:---|
-| 読み | フェッチ ザ レイテス(ト)フロム オリジニン スキーマ |
+| 読み | フェッチ ザ レイテス(ト) フロ‿モリジ‿ニン スキーマ |
+| つながり | from‿origin（子音＋母音） ／ origin‿in（子音＋母音） |
 | JP | schema の最新情報を取ってくる |
 
 ```bash
 git -C schema switch -c feat/user-email --no-track origin/main
 ```
 
-| EN | Create‿a new branch from origin main. |
+| EN | Create‿a new branch from‿origin main. |
 |:---|:---|
-| 読み | クリエイラ ニュー ブランチ フロム オリジン メイン |
+| 読み | クリエイ‿ラ ニュー ブランチ フロ‿モリジン メイン |
+| つながり | Create‿a（t＋母音（t がラ行に近い音になる）） ／ from‿origin（子音＋母音） |
 | JP | schema の最新 main から新しいブランチを作って切り替える |
 
 > `--no-track` を付けないと、追跡先が `origin/main` になります。その状態で `git push` すると main に push しようとするので、付けておきます。
@@ -412,9 +433,10 @@ git -C schema switch -c feat/user-email --no-track origin/main
 git -C schema diff
 ```
 
-| EN | Check‿your changes. |
+| EN | Check your changes. |
 |:---|:---|
 | 読み | チェッキョア チェインジズ |
+| つながり | なし（単語ごとに区切って読む） |
 | JP | 変更内容を確認する |
 
 ```bash
@@ -424,6 +446,7 @@ git -C schema add schema.graphql
 | EN | Stage the file. |
 |:---|:---|
 | 読み | ステイジ ザ ファイル |
+| つながり | なし（単語ごとに区切って読む） |
 | JP | ファイルをステージする（パスは schema の中から見た相対パス） |
 
 ```bash
@@ -432,7 +455,8 @@ git -C schema commit -m "feat: User に email を追加"
 
 | EN | Commit‿it with‿a message. |
 |:---|:---|
-| 読み | カミッティッ(ト) ウィザ メッセージ |
+| 読み | カミッ‿ティッ(ト) ウィ‿ザ メッセージ |
+| つながり | Commit‿it（t＋母音（t がラ行に近い音になる）） ／ with‿a（子音＋母音） |
 | JP | メッセージを付けてコミットする |
 
 ```bash
@@ -441,7 +465,8 @@ git -C schema push -u origin feat/user-email
 
 | EN | Push‿it‿and set‿up tracking. |
 |:---|:---|
-| 読み | プシッタン(ド) セラップ トラッキング |
+| 読み | プッ‿シッ‿タン(ド) セッ‿ラップ トラッキング |
+| つながり | Push‿it（子音＋母音） ／ it‿and（t＋母音（t がラ行に近い音になる）） ／ set‿up（t＋母音（t がラ行に近い音になる）） |
 | JP | push して、追跡先（upstream）を設定する |
 
 この後、schema リポジトリで PR を作成します。
@@ -454,7 +479,8 @@ git -C schema status -sb
 
 | EN | Show the status‿in schema. |
 |:---|:---|
-| 読み | ショウ ザ ステイタスィン スキーマ |
+| 読み | ショウ ザ ステイタ‿スィン スキーマ |
+| つながり | status‿in（子音＋母音） |
 | JP | schema の状態を表示する |
 
 ```
@@ -465,9 +491,10 @@ git -C schema status -sb
 git -C schema log --oneline -3
 ```
 
-| EN | Show the last three‿commits. |
+| EN | Show the last three commits. |
 |:---|:---|
 | 読み | ショウ ザ ラス(ト) スリー カミッツ |
+| つながり | なし（単語ごとに区切って読む） |
 | JP | 直近 3 件のコミットを表示する |
 
 ### 原理: サブモジュールの中は普段「ブランチに乗っていない」
@@ -501,9 +528,10 @@ git -C schema status | head -1
 git add schema
 ```
 
-| EN | Record the new submodule‿commit. |
+| EN | Record the new submodule commit. |
 |:---|:---|
 | 読み | リコー(ド) ザ ニュー サブモジュー(ル)カミッ(ト) |
+| つながり | なし（単語ごとに区切って読む） |
 | JP | サブモジュールの新しいコミット ID を、親のステージに記録する |
 
 #### 別のコミットを指したい場合
@@ -516,16 +544,18 @@ git -C schema fetch origin && git -C schema switch --detach <コミットID ま�
 
 | EN | Detach‿at the commit. |
 |:---|:---|
-| 読み | ディタッチャッ(ト) ザ カミッ(ト) |
+| 読み | ディタッ‿チャッ(ト) ザ カミッ(ト) |
+| つながり | Detach‿at（子音＋母音） |
 | JP | 指定したコミットに移動する |
 
 ```bash
 git diff --staged --submodule=log
 ```
 
-| EN | Check what‿will be committed. |
+| EN | Check what will be committed. |
 |:---|:---|
 | 読み | チェッ(ク) ワッウィル ビー カミティッド |
+| つながり | なし（単語ごとに区切って読む） |
 | JP | コミットされる内容を確認する |
 
 ```
@@ -539,7 +569,8 @@ git commit -m "chore(schema): スキーマを $(git -C schema rev-parse --short 
 
 | EN | Commit the submodule‿update. |
 |:---|:---|
-| 読み | カミッ(ト) ザ サブモジュー(ル)アップデイ(ト) |
+| 読み | カミッ(ト) ザ サブモジュー‿ラップデイ(ト) |
+| つながり | submodule‿update（子音＋母音） |
 | JP | サブモジュールの更新をコミットする（メッセージに新しいコミット ID が入る） |
 
 ```bash
@@ -548,7 +579,8 @@ git push
 
 | EN | Push‿it. |
 |:---|:---|
-| 読み | プシッ(ト) |
+| 読み | プッ‿シッ(ト) |
+| つながり | Push‿it（子音＋母音） |
 | JP | push する |
 
 ### 確認
@@ -557,18 +589,20 @@ git push
 echo "記録: $(git rev-parse --short HEAD:schema)  push済み: $(git -C schema rev-parse --short origin/feat/user-email)"
 ```
 
-| EN | Make sure the recorded‿commit‿is the pushed‿one. |
+| EN | Make sure the recorded commit‿is the pushed one. |
 |:---|:---|
-| 読み | メイ(ク) シュア ザ リコーディッ(ド)カミッティズ ザ プッシュ(ト)ワン |
+| 読み | メイ(ク) シュア ザ リコーディッ(ド) カミッ‿ティズ ザ プッシュ(ト) ワン |
+| つながり | commit‿is（t＋母音（t がラ行に近い音になる）） |
 | JP | 記録したコミットが push したものと同じか確かめる |
 
 ```bash
 git -C schema branch -r --contains HEAD
 ```
 
-| EN | Which remote‿branches‿contain this commit? |
+| EN | Which remote branches contain this commit? |
 |:---|:---|
 | 読み | ウィッチ リモー(ト)ブランチズ コンテイン ディス カミッ(ト) |
+| つながり | なし（単語ごとに区切って読む） |
 | JP | このコミットを含むリモートブランチを表示する（何も出なければ未 push ✗） |
 
 ### 原理: schema 側で squash merge されたら、もう一度差し替える
@@ -595,7 +629,8 @@ git -C schema merge-base --is-ancestor HEAD origin/main && echo OK
 
 | EN | Is this commit‿on schema's main? |
 |:---|:---|
-| 読み | イズ ディス カミットン スキーマズ メイン |
+| 読み | イズ ディス カミッ‿トン スキーマズ メイン |
+| つながり | commit‿on（t＋母音（t がラ行に近い音になる）） |
 | JP | このコミットが schema の main に含まれているか（OK と出れば ✓） |
 
 #### ヒント: push し忘れの防止（一度だけ実行）
@@ -630,9 +665,10 @@ git config --global push.recurseSubmodules check
 git status -sb
 ```
 
-| EN | Check‿the status. |
+| EN | Check the status. |
 |:---|:---|
 | 読み | チェッ(ク) ザ ステイタス |
+| つながり | なし（単語ごとに区切って読む） |
 | JP | 状態を確認する |
 
 ```
@@ -647,7 +683,8 @@ git ls-files -u -- schema
 
 | EN | List the unmerged‿entries for schema. |
 |:---|:---|
-| 読み | リス(ト) ジ アンマージ(ド)エントリーズ フォー スキーマ |
+| 読み | リス(ト) ジ アンマージ‿デントリーズ フォー スキーマ |
+| つながり | unmerged‿entries（子音＋母音） |
 | JP | schema について、衝突している 3 つのコミットを表示する |
 
 ```
@@ -663,9 +700,10 @@ git -C schema fetch origin
 for s in 1 2 3; do echo "[$s] $(git -C schema log --oneline -1 $(git ls-files -u -- schema | awk -v s=$s '$3==s{print $2}'))"; done
 ```
 
-| EN | Show‿each candidate‿commit. |
+| EN | Show each candidate commit. |
 |:---|:---|
 | 読み | ショウィーチ キャンディデイ(ト)カミッ(ト) |
+| つながり | なし（単語ごとに区切って読む） |
 | JP | 3 つの候補コミットの内容を 1 行ずつ表示する |
 
 ```
@@ -689,9 +727,10 @@ for s in 1 2 3; do echo "[$s] $(git -C schema log --oneline -1 $(git ls-files -u
 git -C schema switch --detach origin/main
 ```
 
-| EN | Move schema to the latest‿main. |
+| EN | Move schema to the latest main. |
 |:---|:---|
 | 読み | ムーヴ スキーマ トゥ ザ レイテス(ト)メイン |
+| つながり | なし（単語ごとに区切って読む） |
 | JP | schema を最新の main に移動する |
 
 相手側を選ぶ（**merge 中なら 3、rebase 中なら 2**）:
@@ -700,9 +739,10 @@ git -C schema switch --detach origin/main
 git -C schema switch --detach $(git ls-files -u -- schema | awk '$3==3{print $2}')
 ```
 
-| EN | Take their‿version. |
+| EN | Take their version. |
 |:---|:---|
 | 読み | テイ(ク) ゼア ヴァージョン |
+| つながり | なし（単語ごとに区切って読む） |
 | JP | 相手側のコミットを使う |
 
 自分側を選ぶ（**merge 中なら 2、rebase 中なら 3**）:
@@ -713,7 +753,8 @@ git -C schema switch --detach $(git ls-files -u -- schema | awk '$3==2{print $2}
 
 | EN | Keep‿our version. |
 |:---|:---|
-| 読み | キーパワー ヴァージョン |
+| 読み | キー‿パワー ヴァージョン |
+| つながり | Keep‿our（子音＋母音） |
 | JP | 自分側のコミットを使う |
 
 ### ④ 解決を記録して続行する
@@ -724,7 +765,8 @@ git add schema
 
 | EN | Mark‿it‿as resolved. |
 |:---|:---|
-| 読み | マーキッタズ リゾルヴド |
+| 読み | マー‿キッ‿タズ リゾルヴド |
+| つながり | Mark‿it（子音＋母音） ／ it‿as（t＋母音（t がラ行に近い音になる）） |
 | JP | 解決済みとして記録する |
 
 ビルドとテストで、生成コードが合っているか確かめます。
@@ -742,6 +784,7 @@ git commit --no-edit
 | EN | Commit the merge. |
 |:---|:---|
 | 読み | カミッ(ト) ザ マージ |
+| つながり | なし（単語ごとに区切って読む） |
 | JP | マージコミットを作る |
 
 rebase の場合:
@@ -753,6 +796,7 @@ git rebase --continue
 | EN | Continue the rebase. |
 |:---|:---|
 | 読み | コンティニュー ザ リベイス |
+| つながり | なし（単語ごとに区切って読む） |
 | JP | リベースを続ける |
 
 ### やめたいとき
@@ -764,6 +808,7 @@ git merge --abort
 | EN | Abort the merge. |
 |:---|:---|
 | 読み | アボー(ト) ザ マージ |
+| つながり | なし（単語ごとに区切って読む） |
 | JP | マージを中止して元に戻す |
 
 ```bash
@@ -773,6 +818,7 @@ git rebase --abort
 | EN | Abort the rebase. |
 |:---|:---|
 | 読み | アボー(ト) ザ リベイス |
+| つながり | なし（単語ごとに区切って読む） |
 | JP | リベースを中止して元に戻す |
 
 ### 確認
@@ -783,7 +829,8 @@ git status -sb && git submodule status
 
 | EN | Check that nothing‿is left‿unresolved. |
 |:---|:---|
-| 読み | チェッ(ク) ザッ(ト) ナッスィンギズ レフタンリゾルヴド |
+| 読み | チェッ(ク) ザッ(ト) ナッスィン‿ギズ レフ‿タンリゾルヴド |
+| つながり | nothing‿is（子音＋母音） ／ left‿unresolved（t＋母音（t がラ行に近い音になる）） |
 | JP | 未解決のものが残っていないか確認する |
 
 ```
@@ -795,9 +842,10 @@ git status -sb && git submodule status
 git -C schema merge-base --is-ancestor HEAD origin/main && echo OK
 ```
 
-| EN | Is the chosen‿commit‿on schema's main? |
+| EN | Is the chosen commit‿on schema's main? |
 |:---|:---|
-| 読み | イズ ザ チョウズン カミットン スキーマズ メイン |
+| 読み | イズ ザ チョウズン カミッ‿トン スキーマズ メイン |
+| つながり | commit‿on（t＋母音（t がラ行に近い音になる）） |
 | JP | 選んだコミットが schema の main に含まれているか確認する（OK と出れば ✓） |
 
 ### 原理 1: なぜ Git は自動で解決できないのか

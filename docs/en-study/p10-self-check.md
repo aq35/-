@@ -20,9 +20,9 @@
 | つながり | なし（単語ごとに区切って読む） |
 | JP | コードは変更しないでください。 |
 
-## [What to check]（確認すること）
+## [What‿to check]（確認すること）
 
-読み: ワッ(ト) トゥ チェック
+読み: ワッ‿トゥ チェック ／ つながり: What‿to（同じ・似た子音が続く（前の音は言わない））
 
 | EN | Show the list‿of changed files with git status‿and git‿diff --stat. |
 |:---|:---|
@@ -56,7 +56,7 @@
 
 ## [Output]（出力）
 
-読み: アウトプッ(ト)
+読み: アウトプッ(ト) ／ つながり: なし（単語ごとに区切って読む）
 
 | EN | Mark‿each check‿as "OK / needs‿action". |
 |:---|:---|

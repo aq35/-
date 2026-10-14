@@ -14,9 +14,9 @@
 | つながり | Write‿test（同じ・似た子音が続く（前の音は言わない）） ／ based‿on（子音＋母音） ／ what‿I（t＋母音（t がラ行に近い音になる）） ／ want‿to（同じ・似た子音が続く（前の音は言わない）） |
 | JP | 今回やりたいことをもとに、テストコードを書いてください。 |
 
-## [What I want to do]（やりたいこと）
+## [What‿I want‿to do]（やりたいこと）
 
-読み: ワッ(ト) アイ ウォン(ト) トゥ ドゥー
+読み: ワ‿ライ ウォン‿トゥ ドゥー ／ つながり: What‿I（t＋母音（t がラ行に近い音になる）） ／ want‿to（同じ・似た子音が続く（前の音は言わない））
 
 | EN | The path‿of the spec file (e.g. docs/spec/xxx-next.md), or write‿it‿directly here |
 |:---|:---|
@@ -24,9 +24,9 @@
 | つながり | path‿of（子音＋母音） ／ write‿it（t＋母音（t がラ行に近い音になる）） ／ it‿directly（同じ・似た子音が続く（前の音は言わない）） |
 | JP | 仕様ファイルのパス（例: docs/spec/xxx-next.md）、またはここに直接書いてください。 |
 
-## [What you may change]（変更してよいもの）
+## [What‿you may change]（変更してよいもの）
 
-読み: ワッ(ト) ユー メイ チェインジ
+読み: ワッ‿チュー メイ チェインジ ／ つながり: What‿you（t＋you（チュ））
 
 | EN | Test code‿only (test files, or the test part‿inside the same file). |
 |:---|:---|
@@ -46,9 +46,9 @@
 | つながり | change‿existing（子音＋母音） ／ add‿only（子音＋母音） |
 | JP | 既存のテストは変更しないでください（追加のみ）。 |
 
-## [Write two kinds of tests]（テストは 2 種類書く）
+## [Write‿two kinds‿of tests]（テストは 2 種類書く）
 
-読み: ライ(ト) トゥー カインズ オヴ テスツ
+読み: ライ‿トゥー カイン‿ゾヴ テスツ ／ つながり: Write‿two（同じ・似た子音が続く（前の音は言わない）） ／ kinds‿of（子音＋母音）
 
 | EN | A. Tests for the new spec |
 |:---|:---|
@@ -112,7 +112,7 @@
 
 ## [How to proceed]（進め方）
 
-読み: ハウ トゥ プロスィード
+読み: ハウ トゥ プロスィード ／ つながり: なし（単語ごとに区切って読む）
 
 | EN | First, run‿all‿existing tests‿and record the result (to tell‿apart‿tests that were‿already failing). |
 |:---|:---|
@@ -152,7 +152,7 @@
 
 ## [Rules for writing]（書き方のルール）
 
-読み: ルールズ フォー ライティング
+読み: ルールズ フォー ライティング ／ つながり: なし（単語ごとに区切って読む）
 
 | EN | Follow the location‿and style‿of the existing tests. |
 |:---|:---|

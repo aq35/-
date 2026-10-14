@@ -20,9 +20,9 @@
 | つながり | code‿or（子音＋母音） |
 | JP | コードも文書も変更しないでください。 |
 
-## [What to compare]（比べるもの）
+## [What‿to compare]（比べるもの）
 
-読み: ワッ(ト) トゥ コンペア
+読み: ワッ‿トゥ コンペア ／ つながり: What‿to（同じ・似た子音が続く（前の音は言わない））
 
 | EN | From the design document |
 |:---|:---|
@@ -38,7 +38,7 @@
 
 ## [Output]（出力）
 
-読み: アウトプッ(ト)
+読み: アウトプッ(ト) ／ つながり: なし（単語ごとに区切って読む）
 
 | EN | For "differs" and "only on one side", write which side seems‿outdated‿in‿a "My view" column. |
 |:---|:---|

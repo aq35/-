@@ -16,7 +16,7 @@
 
 ## [This change]（今回の修正）
 
-読み: ディス チェインジ
+読み: ディス チェインジ ／ つながり: なし（単語ごとに区切って読む）
 
 | EN | If the change‿is‿already made, use "the changes‿on the current branch = git‿diff‿origin/main...HEAD". |
 |:---|:---|
@@ -24,9 +24,9 @@
 | つながり | change‿is（子音＋母音） ／ is‿already（子音＋母音） ／ changes‿on（子音＋母音） ／ git‿diff（同じ・似た子音が続く（前の音は言わない）） ／ diff‿origin（子音＋母音） |
 | JP | すでに変更してあるときは、「今のブランチの変更 = git diff origin/main...HEAD」を対象にしてください。 |
 
-## [Meaning of the words]（言葉の意味）
+## [Meaning‿of the words]（言葉の意味）
 
-読み: ミーニング オヴ ザ ワーズ
+読み: ミーニン‿ゴヴ ザ ワーズ ／ つながり: Meaning‿of（子音＋母音）
 
 | EN | "Attribute" means‿a data item (a field‿of‿a struct). |
 |:---|:---|
@@ -40,9 +40,9 @@
 | つながり | It‿does（同じ・似た子音が続く（前の音は言わない）） ／ mean‿a（子音＋母音） ／ language‿attribute（子音＋母音） ／ such‿as（子音＋母音） ／ or‿a（r＋母音） ／ such‿as（子音＋母音） ／ Go's‿struct（同じ・似た子音が続く（前の音は言わない）） ／ struct‿tags（同じ・似た子音が続く（前の音は言わない）） |
 | JP | 言語の属性（Rust の #[...] など）や、タグ（Go の構造体タグなど）の意味ではありません。 |
 
-## [What to look for]（探すもの）
+## [What‿to look for]（探すもの）
 
-読み: ワッ(ト) トゥ ルック フォー
+読み: ワッ‿トゥ ルック フォー ／ つながり: What‿to（同じ・似た子音が続く（前の音は言わない））
 
 | EN | Places that use the same type, function, or constant (callers, usages) |
 |:---|:---|
@@ -118,7 +118,7 @@
 
 ## [Output]（出力）
 
-読み: アウトプッ(ト)
+読み: アウトプッ(ト) ／ つながり: なし（単語ごとに区切って読む）
 
 | EN | For‿items found‿as "similar", write why you judged them similar (which field names matched). |
 |:---|:---|

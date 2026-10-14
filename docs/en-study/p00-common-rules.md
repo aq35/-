@@ -8,7 +8,7 @@
 
 ## [Common rules]（共通ルール）
 
-読み: コモン ルールズ
+読み: コモン ルールズ ／ つながり: なし（単語ごとに区切って読む）
 
 | EN | Answer‿in Japanese. |
 |:---|:---|
@@ -64,9 +64,9 @@
 | つながり | something‿is（子音＋母音） ／ is‿unclear（子音＋母音） ／ collect‿your（t＋you（チュ）） ／ questions‿and（子音＋母音） ／ and‿ask（子音＋母音） ／ them‿at（子音＋母音） |
 | JP | 不明なことは推測せず、質問を集めて最後にまとめて聞いてください。 |
 
-## [Project assumptions]（プロジェクトの前提）
+## [Project‿assumptions]（プロジェクトの前提）
 
-読み: プロジェクト アサンプションズ
+読み: プロジェク‿タサンプションズ ／ つながり: Project‿assumptions（t＋母音（t がラ行に近い音になる））
 
 | EN | The GraphQL schema is‿in schema/ (a git submodule). |
 |:---|:---|

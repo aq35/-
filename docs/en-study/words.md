@@ -4,7 +4,7 @@
 
 [← 学習ページの一覧](index.md)
 
-> カタカナ読みは目安です。実際の発音は、辞書や動画の音声で確認してください。
+> 例文と、複数の語からなる単語の `‿` は、音がつながる場所です（[リンキングの解説](linking.md)）。カタカナは音の目安なので、実際の音は読み上げ音声や辞書で確かめてください。
 
 ## 一覧
 
@@ -18,6 +18,7 @@
 
 | 読み | アクセプタンス クライティアリア |
 |:---|:---|
+| つながり | なし（単語ごとに区切って読む） |
 | JP | 受け入れ条件 |
 | 使い方 | 名詞句（複数扱い）。「これを満たせば完成」という基準 |
 | 例 | Acceptance criteria |
@@ -47,7 +48,7 @@
 |:---|:---|
 | JP | 2 通り以上に取れる、あいまいな |
 | 使い方 | 形容詞。vague（ぼんやり）より「意味が分かれる」 |
-| 例 | If something is ambiguous |
+| 例 | If something‿is‿ambiguous |
 | 出てくる指示文 | [4](p04-next-spec.md) |
 
 #### assumption
@@ -56,7 +57,7 @@
 |:---|:---|
 | JP | 前提、思い込み |
 | 使い方 | 名詞。「正しいと仮定していること」 |
-| 例 | Project assumptions |
+| 例 | Project‿assumptions |
 | 出てくる指示文 | [0](p00-common-rules.md) ／ [11](p11-resume.md) |
 
 #### attach
@@ -65,7 +66,7 @@
 |:---|:---|
 | JP | 付ける、添える |
 | 使い方 | 動詞 |
-| 例 | Attach evidence to every item |
+| 例 | Attach‿evidence to every item |
 | 出てくる指示文 | [2](p02-spec-from-code.md) ／ [5](p05-related-places.md) |
 
 #### attribute
@@ -74,7 +75,7 @@
 |:---|:---|
 | JP | 属性、項目 |
 | 使い方 | 名詞。ここでは「データの項目」。言語機能の「属性」と区別する |
-| 例 | "Attribute" means a data item |
+| 例 | "Attribute" means‿a data item |
 | 出てくる指示文 | [5](p05-related-places.md) |
 
 #### authorization
@@ -99,6 +100,7 @@
 
 | 読み | バウンダリー ヴァリュー |
 |:---|:---|
+| つながり | なし（単語ごとに区切って読む） |
 | JP | 境界値 |
 | 使い方 | 名詞句。0 件・空・最大値など、端の値 |
 | 例 | boundary values (zero items, empty, maximum) |
@@ -110,7 +112,7 @@
 |:---|:---|
 | JP | 分岐 |
 | 使い方 | 名詞。ここでは if や match の「枝分かれ」。git の branch と同じ単語 |
-| 例 | Branches and errors |
+| 例 | Branches‿and‿errors |
 | 出てくる指示文 | [2](p02-spec-from-code.md) |
 
 #### break
@@ -119,7 +121,7 @@
 |:---|:---|
 | JP | 破る、壊す |
 | 使い方 | 動詞。breaks it = 方針を破っている |
-| 例 | breaks it |
+| 例 | breaks‿it |
 | 出てくる指示文 | [9](p09-pre-review.md) |
 
 #### caller
@@ -155,7 +157,7 @@
 |:---|:---|
 | JP | 集める |
 | 使い方 | 動詞 |
-| 例 | collect your questions |
+| 例 | collect‿your questions |
 | 出てくる指示文 | [0](p00-common-rules.md) |
 
 #### commented-out
@@ -182,7 +184,7 @@
 |:---|:---|
 | JP | 気がかり、懸念 |
 | 使い方 | 名詞。Points of concern = 気になった点 |
-| 例 | Points of concern |
+| 例 | Points‿of concern |
 | 出てくる指示文 | [2](p02-spec-from-code.md) |
 
 #### confirm
@@ -191,7 +193,7 @@
 |:---|:---|
 | JP | 確かめる、確認する |
 | 使い方 | 動詞。「本当にそうだ」と確かめること |
-| 例 | Write "unknown" for anything you could not confirm. |
+| 例 | Write "unknown" for‿anything you could not confirm. |
 | 出てくる指示文 | [0](p00-common-rules.md) ／ [6](p06-write-tests.md) |
 
 #### constraint
@@ -209,7 +211,7 @@
 |:---|:---|
 | JP | 矛盾している |
 | 使い方 | 形容詞。名詞は contradiction |
-| 例 | contradictory, vague, and undecided |
+| 例 | contradictory, vague, and‿undecided |
 | 出てくる指示文 | [3](p03-spec-from-design.md) |
 
 #### conversion
@@ -243,6 +245,7 @@
 
 | 読み | ディフォールト ヴァリュー |
 |:---|:---|
+| つながり | なし（単語ごとに区切って読む） |
 | JP | 初期値、デフォルト値 |
 | 使い方 | 名詞句。指定しなかったときに使われる値 |
 | 例 | default values |
@@ -252,9 +255,10 @@
 
 | 読み | ディザイン ドキュメント |
 |:---|:---|
+| つながり | なし（単語ごとに区切って読む） |
 | JP | 設計書 |
 | 使い方 | 名詞句 |
-| 例 | the current design document |
+| 例 | the current‿design document |
 | 出てくる指示文 | [3](p03-spec-from-design.md) ／ [8](p08-spec-diff.md) |
 
 #### differ
@@ -263,7 +267,7 @@
 |:---|:---|
 | JP | 異なる |
 | 使い方 | 動詞。名詞は difference。differs from = 〜と違う |
-| 例 | If a result differs from this |
+| 例 | If‿a result‿differs from this |
 | 出てくる指示文 | [6](p06-write-tests.md) ／ [8](p08-spec-diff.md) |
 
 #### disable
@@ -281,7 +285,7 @@
 |:---|:---|
 | JP | 環境 |
 | 使い方 | 名詞。dev / staging / production など |
-| 例 | the production environment |
+| 例 | the production‿environment |
 | 出てくる指示文 | [0](p00-common-rules.md) |
 
 #### evidence
@@ -290,7 +294,7 @@
 |:---|:---|
 | JP | 根拠、証拠 |
 | 使い方 | 名詞（数えられない）。a evidence とは言わない |
-| 例 | Give evidence as file paths and line numbers. |
+| 例 | Give‿evidence‿as file paths‿and line‿numbers. |
 | 出てくる指示文 | [0](p00-common-rules.md) ／ [1](p01-development-policy.md) ／ [2](p02-spec-from-code.md) ／ [8](p08-spec-diff.md) |
 
 #### excerpt
@@ -299,16 +303,17 @@
 |:---|:---|
 | JP | 抜粋 |
 | 使い方 | 名詞。長いものの一部を取り出したもの |
-| 例 | keep code excerpts short |
+| 例 | keep code‿excerpts short |
 | 出てくる指示文 | [1](p01-development-policy.md) |
 
 #### expected value
 
 | 読み | イクスペクティッド ヴァリュー |
 |:---|:---|
+| つながり | なし（単語ごとに区切って読む） |
 | JP | 期待値（こうなるはずの値） |
 | 使い方 | 名詞句 |
-| 例 | Do not weaken expected values |
+| 例 | Do not weaken‿expected values |
 | 出てくる指示文 | [6](p06-write-tests.md) ／ [7](p07-run-checks.md) |
 
 #### fact
@@ -335,7 +340,7 @@
 |:---|:---|
 | JP | 指摘、発見 |
 | 使い方 | 名詞。調べて見つけたこと |
-| 例 | Do not invent findings. |
+| 例 | Do not‿invent findings. |
 | 出てくる指示文 | [9](p09-pre-review.md) |
 
 #### follow
@@ -344,7 +349,7 @@
 |:---|:---|
 | JP | 従う、守る |
 | 使い方 | 動詞。「あとに続く」の意味もある |
-| 例 | follows it |
+| 例 | follows‿it |
 | 出てくる指示文 | [1](p01-development-policy.md) ／ [9](p09-pre-review.md) |
 
 #### formatting-only
@@ -362,13 +367,14 @@
 |:---|:---|
 | JP | 頻度 |
 | 使い方 | 名詞。形容詞は frequent（頻繁な） |
-| 例 | Frequency (in how many PRs it was raised) |
+| 例 | Frequency (in how many PRs‿it was raised) |
 | 出てくる指示文 | [1](p01-development-policy.md) |
 
 #### generated code
 
 | 読み | ジェネレイティッド コウド |
 |:---|:---|
+| つながり | なし（単語ごとに区切って読む） |
 | JP | 自動生成されたコード |
 | 使い方 | 名詞句 |
 | 例 | generated code |
@@ -380,7 +386,7 @@
 |:---|:---|
 | JP | 推測（する） |
 | 使い方 | 名詞・動詞。「当て推量」のニュアンス |
-| 例 | Do not guess when something is unclear |
+| 例 | Do not guess when something‿is‿unclear |
 | 出てくる指示文 | [0](p00-common-rules.md) ／ [2](p02-spec-from-code.md) ／ [11](p11-resume.md) |
 
 #### impact
@@ -389,7 +395,7 @@
 |:---|:---|
 | JP | 影響 |
 | 使い方 | 名詞。Impact on ... = 〜への影響 |
-| 例 | Impact on existing behavior |
+| 例 | Impact‿on‿existing behavior |
 | 出てくる指示文 | [4](p04-next-spec.md) |
 
 #### implementation
@@ -407,7 +413,7 @@
 |:---|:---|
 | JP | 実装された |
 | 使い方 | 形容詞（implement の過去分詞） |
-| 例 | It is not implemented yet |
+| 例 | It‿is not‿implemented yet |
 | 出てくる指示文 | [6](p06-write-tests.md) |
 
 #### implicit
@@ -425,7 +431,7 @@
 |:---|:---|
 | JP | 意図 |
 | 使い方 | 名詞。「何のためにそう書いたか」 |
-| 例 | comments with the same intent |
+| 例 | comments with the same‿intent |
 | 出てくる指示文 | [1](p01-development-policy.md) ／ [2](p02-spec-from-code.md) |
 
 #### interpretation
@@ -434,7 +440,7 @@
 |:---|:---|
 | JP | 解釈 |
 | 使い方 | 名詞。事実（fact）に対する「自分の読み取り」 |
-| 例 | your own interpretation |
+| 例 | your‿own‿interpretation |
 | 出てくる指示文 | [1](p01-development-policy.md) |
 
 #### invent
@@ -443,7 +449,7 @@
 |:---|:---|
 | JP | でっち上げる、作り出す |
 | 使い方 | 動詞。ここでは「ないものを作る」 |
-| 例 | Do not invent findings. |
+| 例 | Do not‿invent findings. |
 | 出てくる指示文 | [9](p09-pre-review.md) |
 
 #### investigate
@@ -488,7 +494,7 @@
 |:---|:---|
 | JP | 印を付ける |
 | 使い方 | 動詞・名詞 |
-| 例 | Mark each test as not implemented |
+| 例 | Mark‿each test‿as not‿implemented |
 | 出てくる指示文 | [5](p05-related-places.md) ／ [6](p06-write-tests.md) ／ [10](p10-self-check.md) |
 
 #### meet
@@ -497,7 +503,7 @@
 |:---|:---|
 | JP | （条件を）満たす |
 | 使い方 | 動詞。「会う」の意味もある。meets one of these = どれかを満たす |
-| 例 | it meets one of these |
+| 例 | it meets one‿of these |
 | 出てくる指示文 | [1](p01-development-policy.md) |
 
 #### merged
@@ -515,13 +521,14 @@
 |:---|:---|
 | JP | 見落とした、漏れた |
 | 使い方 | 形容詞（miss の過去分詞） |
-| 例 | Missed field additions |
+| 例 | Missed field‿additions |
 | 出てくる指示文 | [5](p05-related-places.md) |
 
 #### non-functional requirements
 
 | 読み | ノンファンクショナル リクワイアメンツ |
 |:---|:---|
+| つながり | なし（単語ごとに区切って読む） |
 | JP | 非機能要件 |
 | 使い方 | 名詞句。機能そのものではなく、性能・可用性・セキュリティなどの条件 |
 | 例 | Non-functional requirements |
@@ -542,7 +549,7 @@
 |:---|:---|
 | JP | 整理する |
 | 使い方 | 動詞。ばらばらなものを筋道立てて並べる |
-| 例 | organize its "development policy" |
+| 例 | organize‿its "development policy" |
 | 出てくる指示文 | [1](p01-development-policy.md) ／ [3](p03-spec-from-design.md) ／ [4](p04-next-spec.md) |
 
 #### outdated
@@ -551,7 +558,7 @@
 |:---|:---|
 | JP | 古くなった |
 | 使い方 | 形容詞。out of date と同じ意味 |
-| 例 | whether it may be outdated |
+| 例 | whether‿it may be outdated |
 | 出てくる指示文 | [3](p03-spec-from-design.md) ／ [8](p08-spec-diff.md) |
 
 #### policy
@@ -578,13 +585,14 @@
 |:---|:---|
 | JP | 本番（環境） |
 | 使い方 | 名詞。prod と略す。development（開発）の反対 |
-| 例 | operate on the production environment |
+| 例 | operate‿on the production‿environment |
 | 出てくる指示文 | [0](p00-common-rules.md) ／ [6](p06-write-tests.md) |
 
 #### production code
 
 | 読み | プロダクション コウド |
 |:---|:---|
+| つながり | なし（単語ごとに区切って読む） |
 | JP | 本番のコード |
 | 使い方 | 名詞句。テスト用ではないコード |
 | 例 | Do not change the non-test part (production code) |
@@ -605,7 +613,7 @@
 |:---|:---|
 | JP | 守る |
 | 使い方 | 動詞。Tests that protect existing behavior = 既存の動作を守るテスト |
-| 例 | Tests that protect existing behavior |
+| 例 | Tests that protect‿existing behavior |
 | 出てくる指示文 | [6](p06-write-tests.md) |
 
 #### purpose
@@ -614,7 +622,7 @@
 |:---|:---|
 | JP | 目的 |
 | 使い方 | 名詞 |
-| 例 | Purpose (what the feature is for, as far as the code shows) |
+| 例 | Purpose (what the feature‿is for, as far‿as the code shows) |
 | 出てくる指示文 | [2](p02-spec-from-code.md) ／ [3](p03-spec-from-design.md) ／ [4](p04-next-spec.md) |
 
 #### record
@@ -659,7 +667,7 @@
 |:---|:---|
 | JP | 関連する |
 | 使い方 | 形容詞。related to ... = 〜に関連した |
-| 例 | everything related to this change |
+| 例 | everything related‿to this change |
 | 出てくる指示文 | [5](p05-related-places.md) |
 
 #### resolved
@@ -668,7 +676,7 @@
 |:---|:---|
 | JP | 解決済みの |
 | 使い方 | 形容詞（resolve の過去分詞） |
-| 例 | Its thread is Resolved |
+| 例 | Its thread‿is Resolved |
 | 出てくる指示文 | [1](p01-development-policy.md) |
 
 #### resume
@@ -713,7 +721,7 @@
 |:---|:---|
 | JP | 範囲 |
 | 使い方 | 名詞。「どこまでやるか」の線引き |
-| 例 | out of scope |
+| 例 | out‿of scope |
 | 出てくる指示文 | [1](p01-development-policy.md) ／ [4](p04-next-spec.md) ／ [10](p10-self-check.md) |
 
 #### secret
@@ -745,11 +753,12 @@
 
 #### side effect
 
-| 読み | サイド イフェクト |
+| 読み | サイ‿ディフェクト |
 |:---|:---|
+| つながり | side‿effect（子音＋母音） |
 | JP | 副作用 |
 | 使い方 | 名詞句。結果を返す以外に起きること（DB 更新、ログなど） |
-| 例 | Side effects (DB updates, external API calls, logs, cache) |
+| 例 | Side‿effects (DB updates, external‿API calls, logs, cache) |
 | 出てくる指示文 | [2](p02-spec-from-code.md) |
 
 #### silence
@@ -767,7 +776,7 @@
 |:---|:---|
 | JP | 似ている |
 | 使い方 | 形容詞。反対は different |
-| 例 | whose fields are similar |
+| 例 | whose fields‿are similar |
 | 出てくる指示文 | [5](p05-related-places.md) |
 
 #### skip
@@ -776,16 +785,17 @@
 |:---|:---|
 | JP | 飛ばす（実行しない） |
 | 使い方 | 動詞 |
-| 例 | is skipped |
+| 例 | is‿skipped |
 | 出てくる指示文 | [6](p06-write-tests.md) ／ [7](p07-run-checks.md) |
 
 #### source of truth
 
-| 読み | ソース オヴ トゥルース |
+| 読み | ソー‿ソヴ トゥルース |
 |:---|:---|
+| つながり | source‿of（子音＋母音） |
 | JP | 正（正しさの基準になるもの） |
 | 使い方 | 名詞句。複数の情報が食い違うとき、どれを信じるか |
-| 例 | The source of truth for the spec |
+| 例 | The source‿of truth for the spec |
 | 出てくる指示文 | [2](p02-spec-from-code.md) ／ [7](p07-run-checks.md) |
 
 #### state
@@ -794,7 +804,7 @@
 |:---|:---|
 | JP | 断言する、述べる |
 | 使い方 | 動詞。名詞の「状態」と同じ単語 |
-| 例 | Do not state it as certain. |
+| 例 | Do not state‿it‿as certain. |
 | 出てくる指示文 | [8](p08-spec-diff.md) |
 
 #### strictness
@@ -803,7 +813,7 @@
 |:---|:---|
 | JP | 厳しさ |
 | 使い方 | 名詞。strict（厳しい）から |
-| 例 | Lower the strictness of a command |
+| 例 | Lower the strictness‿of‿a command |
 | 出てくる指示文 | [7](p07-run-checks.md) |
 
 #### suggested
@@ -830,7 +840,7 @@
 |:---|:---|
 | JP | 怪しい |
 | 使い方 | 形容詞。名詞は suspicion |
-| 例 | suspicious points (possible bugs, comments that disagree with the code) |
+| 例 | suspicious points (possible bugs, comments that‿disagree with the code) |
 | 出てくる指示文 | [2](p02-spec-from-code.md) |
 
 #### tag
@@ -839,16 +849,17 @@
 |:---|:---|
 | JP | タグ（フィールドに付ける注釈） |
 | 使い方 | 名詞 |
-| 例 | a tag (such as Go's struct tags) |
+| 例 | a tag (such‿as Go's‿struct‿tags) |
 | 出てくる指示文 | [5](p05-related-places.md) |
 
 #### task runner
 
 | 読み | タスク ランナー |
 |:---|:---|
+| つながり | なし（単語ごとに区切って読む） |
 | JP | タスクランナー（コマンドをまとめて実行する道具） |
 | 使い方 | 名詞句。just や make のこと |
-| 例 | Task runners and documents |
+| 例 | Task runners‿and‿documents |
 | 出てくる指示文 | [7](p07-run-checks.md) |
 
 #### thread
@@ -857,7 +868,7 @@
 |:---|:---|
 | JP | （コメントの）やりとりのまとまり |
 | 使い方 | 名詞。もとは「糸」 |
-| 例 | Its thread is Resolved |
+| 例 | Its thread‿is Resolved |
 | 出てくる指示文 | [1](p01-development-policy.md) |
 
 #### timeout
@@ -875,7 +886,7 @@
 |:---|:---|
 | JP | はっきりしない |
 | 使い方 | 形容詞。clear（はっきりした）の反対 |
-| 例 | when something is unclear |
+| 例 | when something‿is‿unclear |
 | 出てくる指示文 | [0](p00-common-rules.md) |
 
 #### unconfirmed
@@ -884,7 +895,7 @@
 |:---|:---|
 | JP | 確認できていない |
 | 使い方 | 形容詞。confirmed（確認済み）の反対 |
-| 例 | Unconfirmed assumptions |
+| 例 | Unconfirmed‿assumptions |
 | 出てくる指示文 | [11](p11-resume.md) |
 
 #### undecided
@@ -902,7 +913,7 @@
 |:---|:---|
 | JP | 無関係な |
 | 使い方 | 形容詞。related の反対 |
-| 例 | files unrelated to this change |
+| 例 | files‿unrelated‿to this change |
 | 出てくる指示文 | [7](p07-run-checks.md) ／ [10](p10-self-check.md) |
 
 #### vague
@@ -911,7 +922,7 @@
 |:---|:---|
 | JP | あいまいな、はっきりしない |
 | 使い方 | 形容詞 |
-| 例 | contradictory, vague, and undecided |
+| 例 | contradictory, vague, and‿undecided |
 | 出てくる指示文 | [3](p03-spec-from-design.md) |
 
 #### validation
@@ -938,7 +949,7 @@
 |:---|:---|
 | JP | 弱める |
 | 使い方 | 動詞。weak（弱い）から |
-| 例 | Do not weaken expected values |
+| 例 | Do not weaken‿expected values |
 | 出てくる指示文 | [6](p06-write-tests.md) |
 
 #### whose

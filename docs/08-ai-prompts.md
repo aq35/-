@@ -278,49 +278,60 @@ git merge / rebase で、schema サブモジュールが衝突しています。
 
 ## 4. 効く一言（そのまま足して使える）
 
-| EN | Give me a plan first. Do not change anything yet. |
+> 表の `‿` は、音がつながる場所です。読みの同じ位置にも入れています（[リンキングの解説](en-study/linking.md)）。AI に貼るときは、`‿` を普通の空白に戻してください。
+
+| EN | Give me a plan first. Do not change‿anything yet. |
 |:---|:---|
-| 読み | ギヴ ミー ア プラン ファース(ト)。ドゥー ノッ(ト) チェインジ エニスィング イェッ(ト) |
+| 読み | ギヴ ミー ア プラン ファース(ト)。ドゥー ナッ(ト) チェイン‿ジェニスィング イェッ(ト) |
+| つながり | change‿anything（子音＋母音） |
 | JP | まず計画だけ出して。まだ何も変更しないで |
 
 | EN | If you are not sure, ask. Do not guess. |
 |:---|:---|
 | 読み | イフ ユー アー ノッ(ト) シュア、アスク。ドゥー ノッ(ト) ゲス |
+| つながり | なし（単語ごとに区切って読む） |
 | JP | 分からなければ質問して。推測しないで |
 
-| EN | Show your evidence: file names and line numbers. |
+| EN | Show your‿evidence: file names‿and line‿numbers. |
 |:---|:---|
-| 読み | ショウ ヨア エヴィデンス：ファイル ネイムズ アン(ド) ライン ナンバーズ |
+| 読み | ショウ ヨア‿レヴィデンス：ファイル ネイム‿ザン(ド) ライ‿ナンバーズ |
+| つながり | your‿evidence（r＋母音） ／ names‿and（子音＋母音） ／ line‿numbers（同じ・似た子音が続く（前の音は言わない）） |
 | JP | 根拠を示して。ファイル名と行番号つきで |
 
 | EN | Keep the change minimal. |
 |:---|:---|
 | 読み | キープ ザ チェインジ ミニマル |
+| つながり | なし（単語ごとに区切って読む） |
 | JP | 変更は最小限にして |
 
-| EN | Separate facts from assumptions. |
+| EN | Separate facts from‿assumptions. |
 |:---|:---|
-| 読み | セパレイ(ト) ファクツ フロム アサンプションズ |
+| 読み | セパレイ(ト) ファクツ フロ‿マサンプションズ |
+| つながり | from‿assumptions（子音＋母音） |
 | JP | 事実と推測を分けて書いて |
 
-| EN | Run the tests and report the results. |
+| EN | Run the tests‿and report the results. |
 |:---|:---|
-| 読み | ラン ザ テスツ アン(ド) リポー(ト) ザ リザルツ |
+| 読み | ラン ザ テス‿ツァン(ド) リポー(ト) ザ リザルツ |
+| つながり | tests‿and（子音＋母音） |
 | JP | テストを実行して、結果を報告して |
 
-| EN | Do not touch anything outside the scope. |
+| EN | Do not‿touch‿anything‿outside the scope. |
 |:---|:---|
-| 読み | ドゥー ノッ(ト) タッチ エニスィング アウトサイ(ド) ザ スコウプ |
+| 読み | ドゥー ナッ‿タッ‿チェニスィン‿ガウトサイ(ド) ザ スコウプ |
+| つながり | not‿touch（同じ・似た子音が続く（前の音は言わない）） ／ touch‿anything（子音＋母音） ／ anything‿outside（子音＋母音） |
 | JP | 範囲外には触れないで |
 
-| EN | Wait for my approval before you commit or push. |
+| EN | Wait for my approval before you commit‿or push. |
 |:---|:---|
-| 読み | ウェイ(ト) フォー マイ アプルーヴァル ビフォー ユー カミッ(ト) オア プッシュ |
+| 読み | ウェイ(ト) フォー マイ アプルーヴァル ビフォー ユー カミッ‿ロア プッシュ |
+| つながり | commit‿or（t＋母音（t がラ行に近い音になる）） |
 | JP | コミットや push の前に、私の承認を待って |
 
-| EN | Explain it so that a new team member can follow. |
+| EN | Explain‿it so that‿a new team‿member can follow. |
 |:---|:---|
-| 読み | イクスプレイニッ(ト) ソウ ザッタ ニュー ティーム メンバー キャン フォロウ |
+| 読み | イクスプレイ‿ニッ(ト) ソウ ザッ‿ラ ニュー ティー‿メンバー キャン フォロウ |
+| つながり | Explain‿it（子音＋母音） ／ that‿a（t＋母音（t がラ行に近い音になる）） ／ team‿member（同じ・似た子音が続く（前の音は言わない）） |
 | JP | チームに入ったばかりの人が分かるように説明して |
 
 ## 5. 操作の線引き（どこまで任せるか）
@@ -339,6 +350,8 @@ git merge / rebase で、schema サブモジュールが衝突しています。
 
 ## 6. AI の結果を確認する（コマンド）
 
+> 表の `‿` は、音がつながる場所です（[リンキングの解説](en-study/linking.md)）。
+
 AI が「できました」と言ったら、必ず自分で確かめます。
 
 ```bash
@@ -348,6 +361,7 @@ git status -sb
 | EN | Show a short status. |
 |:---|:---|
 | 読み | ショウ ア ショー(ト) ステイタス |
+| つながり | なし（単語ごとに区切って読む） |
 | JP | 変更されたファイルの一覧（想定外のファイルがないか） |
 
 ```bash
@@ -357,6 +371,7 @@ git diff --stat
 | EN | Show a summary of changes. |
 |:---|:---|
 | 読み | ショウ ア サマリ オヴ チェインジズ |
+| つながり | なし（単語ごとに区切って読む） |
 | JP | どのファイルが何行変わったか（頼んだ範囲に収まっているか） |
 
 ```bash
@@ -366,15 +381,17 @@ git diff
 | EN | Show the actual changes. |
 |:---|:---|
 | 読み | ショウ ジ アクチュアル チェインジズ |
+| つながり | なし（単語ごとに区切って読む） |
 | JP | 変更の中身（1 行ずつ読む） |
 
 ```bash
 git diff --submodule=log
 ```
 
-| EN | Show submodule changes as a log. |
+| EN | Show submodule changes‿as‿a log. |
 |:---|:---|
-| 読み | ショウ サブモジュー(ル) チェインジズ アザ ログ |
+| 読み | ショウ サブモジュー(ル) チェインジ‿ザ‿ザ ログ |
+| つながり | changes‿as（子音＋母音） ／ as‿a（子音＋母音） |
 | JP | サブモジュールの指すコミットが勝手に変わっていないか |
 
 ```bash
@@ -384,6 +401,7 @@ cargo fmt --check && cargo clippy --all-targets -- -D warnings && cargo test
 | EN | Check the format, lint, and run the tests. |
 |:---|:---|
 | 読み | チェッ(ク) ザ フォーマッ(ト)、リン(ト)、アン(ド) ラン ザ テスツ |
+| つながり | なし（単語ごとに区切って読む） |
 | JP | 整形・lint・テストを実行する（AI の報告を鵜呑みにせず、自分で実行する） |
 
 ### 確認チェックリスト

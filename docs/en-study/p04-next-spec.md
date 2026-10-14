@@ -14,9 +14,9 @@
 | つながり | what‿I（t＋母音（t がラ行に近い音になる）） ／ want‿to（同じ・似た子音が続く（前の音は言わない）） |
 | JP | 私のやりたいことを、仕様に整理してください。 |
 
-## [What I want to do]（やりたいこと）
+## [What‿I want‿to do]（やりたいこと）
 
-読み: ワッ(ト) アイ ウォン(ト) トゥ ドゥー
+読み: ワ‿ライ ウォン‿トゥ ドゥー ／ つながり: What‿I（t＋母音（t がラ行に近い音になる）） ／ want‿to（同じ・似た子音が続く（前の音は言わない））
 
 | EN | Write freely here. Bullet points‿are fine. |
 |:---|:---|
@@ -26,7 +26,7 @@
 
 ## [Rules]（ルール）
 
-読み: ルールズ
+読み: ルールズ ／ つながり: なし（単語ごとに区切って読む）
 
 | EN | Do not‿add‿anything to the spec that‿I did not write. |
 |:---|:---|
@@ -64,9 +64,9 @@
 | つながり | what‿you（t＋you（チュ）） |
 | JP | 何を読んだかを教えてください。 |
 
-## [Structure of the spec]（仕様の構成）
+## [Structure‿of the spec]（仕様の構成）
 
-読み: ストラクチャー オヴ ザ スペック
+読み: ストラクチャ‿ロヴ ザ スペック ／ つながり: Structure‿of（r＋母音）
 
 | EN | Purpose |
 |:---|:---|
@@ -112,7 +112,7 @@
 
 ## [Output]（出力）
 
-読み: アウトプッ(ト)
+読み: アウトプッ(ト) ／ つながり: なし（単語ごとに区切って読む）
 
 | EN | When you finish, show me only the "Questions" and wait for my answers. |
 |:---|:---|

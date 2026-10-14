@@ -22,7 +22,7 @@
 
 ## [Scope]（対象）
 
-読み: スコウプ
+読み: スコウプ ／ つながり: なし（単語ごとに区切って読む）
 
 | EN | Only merged PRs. |
 |:---|:---|
@@ -36,9 +36,9 @@
 | つながり | merged‿are（子音＋母音） ／ are‿out（r＋母音） ／ out‿of（t＋母音（t がラ行に近い音になる）） |
 | JP | マージされずに閉じた PR は対象外です。 |
 
-## [What counts as an "adopted" review comment]（「採用された」レビュー指摘とみなす条件）
+## [What counts‿as‿an "adopted" review comment]（「採用された」レビュー指摘とみなす条件）
 
-読み: ワッ カウンツ アザン "アダプティッド" リヴュー コメン(ト)
+読み: ワッ(ト) カウン‿ツァ‿ザン "アダプティッド" リヴュー コメン(ト) ／ つながり: counts‿as（子音＋母音） ／ as‿an（子音＋母音）
 
 | EN | A comment counts‿as "adopted" only if‿it meets one‿of these: |
 |:---|:---|
@@ -66,7 +66,7 @@
 
 ## [How to investigate]（調べ方）
 
-読み: ハウ トゥ インヴェスティゲイ(ト)
+読み: ハウ トゥ インヴェスティゲイ(ト) ／ つながり: なし（単語ごとに区切って読む）
 
 | EN | Use the gh command‿to fetch the PR list, the review comments, and the commits made‿after‿each comment. |
 |:---|:---|
@@ -82,7 +82,7 @@
 
 ## [How to organize]（整理のしかた）
 
-読み: ハウ トゥ オーガナイズ
+読み: ハウ トゥ オーガナイズ ／ つながり: なし（単語ごとに区切って読む）
 
 | EN | Merge comments with the same‿intent‿into one policy. |
 |:---|:---|
@@ -146,7 +146,7 @@
 
 ## [Output]（出力）
 
-読み: アウトプッ(ト)
+読み: アウトプッ(ト) ／ つながり: なし（単語ごとに区切って読む）
 
 | EN | Structure: Summary / Policies (most frequent first) / One-off comments / Comments not‿adopted / Scope‿and method‿of the investigation |
 |:---|:---|

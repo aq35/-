@@ -22,7 +22,7 @@
 
 ## [Target]（対象）
 
-読み: ターゲッ(ト)
+読み: ターゲッ(ト) ／ つながり: なし（単語ごとに区切って読む）
 
 | EN | Changes |
 |:---|:---|
@@ -38,7 +38,7 @@
 
 ## [Request]（お願い）
 
-読み: リクエスト
+読み: リクエスト ／ つながり: なし（単語ごとに区切って読む）
 
 | EN | For‿each policy item, judge whether this change "follows‿it / breaks‿it / is not related". |
 |:---|:---|

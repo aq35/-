@@ -16,7 +16,7 @@
 
 ## [Design document]（対象の設計書）
 
-読み: ディザイン ドキュメン(ト)
+読み: ディザイン ドキュメン(ト) ／ つながり: なし（単語ごとに区切って読む）
 
 | EN | If‿it‿is not specified‿or not found, look‿in docs/ and‿elsewhere, and‿tell me which document‿you read. |
 |:---|:---|
@@ -26,7 +26,7 @@
 
 ## [Premise]（前提）
 
-読み: プレミス
+読み: プレミス ／ つながり: なし（単語ごとに区切って読む）
 
 | EN | Organize‿only what the design document says. |
 |:---|:---|
@@ -46,9 +46,9 @@
 | つながり | なし（単語ごとに区切って読む） |
 | JP | コードは変更しないでください。 |
 
-## [What to organize]（整理する内容）
+## [What‿to organize]（整理する内容）
 
-読み: ワッ(ト) トゥ オーガナイズ
+読み: ワッ‿トゥ オーガナイズ ／ つながり: What‿to（同じ・似た子音が続く（前の音は言わない））
 
 | EN | Purpose / Input / Output / Flow / Errors / Constraints / Non-functional requirements (performance, availability, security) |
 |:---|:---|
@@ -58,7 +58,7 @@
 
 ## [How to write]（書き方）
 
-読み: ハウ トゥ ライ(ト)
+読み: ハウ トゥ ライ(ト) ／ つながり: なし（単語ごとに区切って読む）
 
 | EN | For‿each‿item, say which section‿of the design document‿it comes from. |
 |:---|:---|
